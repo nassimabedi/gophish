@@ -45,6 +45,39 @@ func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func (as *Server) CampaignsTest(w http.ResponseWriter, r *http.Request) {
+        switch {
+        case r.Method == "GET":
+                cs, err := models.GetCampaigns(ctx.Get(r, "user_id").(int64))
+                if err != nil {
+                        log.Error(err)
+                }
+                JSONResponse(w, cs, http.StatusOK)
+        //POST: Create a new campaign and return it as JSON
+        case r.Method == "POST":
+                c := models.Campaign{}
+                // Put the request into a campaign
+                err := json.NewDecoder(r.Body).Decode(&c)
+                if err != nil {
+                        JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
+                        return
+                }
+                err = models.PostCampaign(&c, ctx.Get(r, "user_id").(int64))
+                if err != nil {
+                        JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusBadRequest)
+                        return
+                }
+                // If the campaign is scheduled to launch immediately, send it to the worker.
+                // Otherwise, the worker will pick it up at the scheduled time
+                if c.Status == models.CampaignInProgress {
+                        go as.worker.LaunchCampaign(c)
+                }
+                JSONResponse(w, c, http.StatusCreated)
+        }
+}
+
+
 // CampaignsSummary returns the summary for the current user's campaigns
 func (as *Server) CampaignsSummary(w http.ResponseWriter, r *http.Request) {
 	switch {
