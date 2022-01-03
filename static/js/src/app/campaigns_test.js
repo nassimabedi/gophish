@@ -125,14 +125,13 @@ var targets = [];
 
 
 
-function addTarget(firstNameInput, lastNameInput, emailInput, positionInput) {
+function addTarget(templateInput, GroupInput) {
     // Create new data row.
-    var email = escapeHtml(emailInput).toLowerCase();
+    // var email = escapeHtml(emailInput).toLowerCase();
+    var email = 'test@test.com';
     var newRow = [
-        escapeHtml(firstNameInput),
-        escapeHtml(lastNameInput),
-        email,
-        escapeHtml(positionInput),
+        escapeHtml(templateInput),
+        escapeHtml(GroupInput),        
         '<span style="cursor:pointer;"><i class="fa fa-trash-o"></i></span>'
     ];
 
@@ -553,15 +552,19 @@ $(document).ready(function () {
     $("#targetForm").submit(function () {
         // Validate the form data
         var targetForm = document.getElementById("targetForm")
-        if (!targetForm.checkValidity()) {
-            targetForm.reportValidity()
-            return
-        }
+        // if (!targetForm.checkValidity()) {
+        //     targetForm.reportValidity()
+        //     return
+        // }
+       
+        templateName = $("#template :selected" ).text()
+        var groupsName = $('#users option:selected').toArray().map(item => item.text).join();
+        
         addTarget(
-            $("#firstName").val(),
-            $("#lastName").val(),
-            $("#email").val(),
-            $("#position").val());
+            templateName,
+            groupsName
+        );
+    
         targets.DataTable().draw();
 
         // Reset user input.
