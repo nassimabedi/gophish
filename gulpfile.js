@@ -54,6 +54,9 @@ scripts = function () {
             app_directory + 'autocomplete.js',
             app_directory + 'campaign_results.js',
             app_directory + 'campaigns.js',
+	    //start by Nassim
+	    app_directory + 'campaigns_test.js',
+	    //end by Nassim
             app_directory + 'dashboard.js',
             app_directory + 'groups.js',
             app_directory + 'landing_pages.js',

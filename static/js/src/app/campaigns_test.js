@@ -11,8 +11,16 @@ var labels = {
 var campaigns = []
 var campaign = {}
 
+//start by Nassim
+var targets = []
+//end by Nassim
+
 // Launch attempts to POST to /campaigns/
 function launch() {
+    //start by Nassim
+var targets = [];
+//end by Nassim
+
     Swal.fire({
         title: "Are you sure?",
         text: "This will schedule the campaign to be launched.",
@@ -79,6 +87,84 @@ function launch() {
         })
     })
 }
+
+//start by Nassim
+
+// function addTarget(firstNameInput, lastNameInput) {
+//     // Create new data row.
+//     //var email = escapeHtml(emailInput).toLowerCase();
+//     var email = "ssss"
+//     var newRow = [
+//         //escapeHtml(firstNameInput),
+//         //escapeHtml(lastNameInput),
+// 	'ssss',
+// 	'asdasd',
+//         '<span style="cursor:pointer;"><i class="fa fa-trash-o"></i></span>'
+//     ];
+
+//     // Check table to see if email already exists.
+//     var targetsTable = targets.DataTable();
+//     var existingRowIndex = targetsTable
+//         .column(2, {
+//             order: "index"
+//         }) // Email column has index of 2
+//         .data()
+//         .indexOf(email);
+//     // Update or add new row as necessary.
+//     if (existingRowIndex >= 0) {
+//         targetsTable
+//             .row(existingRowIndex, {
+//                 order: "index"
+//             })
+//             .data(newRow);
+//     } else {
+//         targetsTable.row.add(newRow);
+//     }
+// }
+
+
+
+
+function addTarget(firstNameInput, lastNameInput, emailInput, positionInput) {
+    // Create new data row.
+    var email = escapeHtml(emailInput).toLowerCase();
+    var newRow = [
+        escapeHtml(firstNameInput),
+        escapeHtml(lastNameInput),
+        email,
+        escapeHtml(positionInput),
+        '<span style="cursor:pointer;"><i class="fa fa-trash-o"></i></span>'
+    ];
+
+    // Check table to see if email already exists.
+    // $.noConflict();
+    // var targets = $('#targetsTable')
+    targets = $("#targetsTable").dataTable({
+        destroy: true, // Destroy any other instantiated table - http://datatables.net/manual/tech-notes/3#destroy
+        columnDefs: [{
+            orderable: false,
+            targets: "no-sort"
+        }]
+    })
+    var targetsTable = targets.DataTable();
+    var existingRowIndex = targetsTable
+        .column(2, {
+            order: "index"
+        }) // Email column has index of 2
+        .data()
+        .indexOf(email);
+    // Update or add new row as necessary.
+    if (existingRowIndex >= 0) {
+        targetsTable
+            .row(existingRowIndex, {
+                order: "index"
+            })
+            .data(newRow);
+    } else {
+        targetsTable.row.add(newRow);
+    }
+}
+//end by Nassim
 
 // Attempts to send a test email by POSTing to /campaigns/
 function sendTestEmail() {
@@ -435,4 +521,60 @@ $(document).ready(function () {
             return 0;
         });
     })
+    // start by Nassim
+	// $("#targetForm").submit(function () {
+    //     // Validate the form data
+    //     var targetForm = document.getElementById("targetForm")
+    //     if (!targetForm.checkValidity()) {
+    //         targetForm.reportValidity()
+    //         return
+    //     }
+    //     addTarget(
+    //         //$("#firstName").val(),
+    //         //$("#position").val());
+    //     'aaaaa',
+	// 'bbbbb');
+    //     targets.DataTable().draw();
+
+    //     // Reset user input.
+    //     // $("#targetForm>div>input").val('');
+    //     //$("#firstName").focus();
+    //     return false;
+    // });
+
+    // $("#targetsTable").on("click", "span>i.fa-trash-o", function () {
+    //     targets.DataTable()
+    //         .row($(this).parents('tr'))
+    //         .remove()
+    //         .draw();
+    // });
+
+    $('#targetsTable').DataTable();
+    $("#targetForm").submit(function () {
+        // Validate the form data
+        var targetForm = document.getElementById("targetForm")
+        if (!targetForm.checkValidity()) {
+            targetForm.reportValidity()
+            return
+        }
+        addTarget(
+            $("#firstName").val(),
+            $("#lastName").val(),
+            $("#email").val(),
+            $("#position").val());
+        targets.DataTable().draw();
+
+        // Reset user input.
+        $("#targetForm>div>input").val('');
+        $("#firstName").focus();
+        return false;
+    });
+    // Handle Deletion
+    $("#targetsTable").on("click", "span>i.fa-trash-o", function () {
+        targets.DataTable()
+            .row($(this).parents('tr'))
+            .remove()
+            .draw();
+    });
+    // end by Nassim
 })

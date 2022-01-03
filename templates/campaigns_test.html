@@ -2,7 +2,7 @@
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="row">
         <h1 class="page-header">
-            Campaigns
+            Campaigns Test
         </h1>
     </div>
     <div id="flashes" class="row"></div>
@@ -125,63 +125,42 @@
                     <label class="control-label" for="users">Groups:</label>
                     <select class="form-control" id="users" multiple="multiple"></select>
 		    <!-- Start by Nassim -->
-                   <div class="row">
+                   <!--<div class="row">
 			    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addEmailTemplate()">Add</button>
-	           </div>
-		   <div id="emptyEmailTemplate" class="row" style="display:none;">
-                      <div class="alert alert-info">
-                        
-                      </div>
+		   </div>-->
+
+                    <div class="row">
+                        <form id="targetForm">
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" placeholder="First Name" id="firstName">
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" placeholder="Last Name" id="lastName">
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="email" class="form-control" placeholder="Email" id="email" required>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" placeholder="Position" id="position">
+                            </div>
+                            <div class="col-sm-1">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fa fa-plus"></i> Add</button>
+                            </div>
+                        </form>
                     </div>
-		   <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="activeCampaigns">
-            <div id="flashes" class="row"></div>
-            &nbsp;
-            <div id="loading">
-                <i class="fa fa-spinner fa-spin fa-4x"></i>
-            </div>
-            <div id="emptyMessage" class="row" style="display:none;">
-                <div class="alert alert-info">
-                    No campaigns created yet. Let's create one!
-                </div>
-            </div>
-            <div class="row">
-                <table id="campaignEmailTemplateTable" class="table" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th class="col-md-3">Email/Group</th>
-                            <th class="col-md-4">Template</th>
-                            <th class="col-md-3 no-sort"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div role="tabpanel" class="tab-pane" id="archivedCampaigns">
-            </br>
-            <div id="emptyMessage" class="row" style="display:none;">
-                </br>
-                <div class="alert alert-info">
-                    No archived campaigns.
-                </div>
-            </div>
-            <div class="row">
-                <table id="campaignEmailTemplateTableArchive" class="table" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th class="col-md-3">Email/Group</th>
-                            <th class="col-md-4">Template</th>
-                            <th class="col-md-3 no-sort"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+                    <br />
+                    <table id="targetsTable" class="table table-hover table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Position</th>
+                                <th class="no-sort"></th>
+                        <tbody>
+                        </tbody>
+                    </table>
 
 		   <!-- End by Nassim -->
 
