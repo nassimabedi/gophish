@@ -127,7 +127,7 @@ func (as *AdminServer) registerRoutes() {
 	router.HandleFunc("/logout", mid.Use(as.Logout, mid.RequireLogin))
 	router.HandleFunc("/reset_password", mid.Use(as.ResetPassword, mid.RequireLogin))
 	router.HandleFunc("/campaigns", mid.Use(as.Campaigns, mid.RequireLogin))
-	router.HandleFunc("/campaigns_test", mid.Use(as.CampaignsTest, mid.RequireLogin))
+	router.HandleFunc("/campaigns_ttt", mid.Use(as.CampaignsTtt, mid.RequireLogin))
 	router.HandleFunc("/campaigns/{id:[0-9]+}", mid.Use(as.CampaignID, mid.RequireLogin))
 	router.HandleFunc("/templates", mid.Use(as.Templates, mid.RequireLogin))
 	router.HandleFunc("/groups", mid.Use(as.Groups, mid.RequireLogin))
@@ -210,10 +210,10 @@ func (as *AdminServer) Campaigns(w http.ResponseWriter, r *http.Request) {
 }
 
 // Campaigns handles the default path and template execution
-func (as *AdminServer) CampaignsTest(w http.ResponseWriter, r *http.Request) {
+func (as *AdminServer) CampaignsTtt(w http.ResponseWriter, r *http.Request) {
         params := newTemplateParams(r)
         params.Title = "CampaignsTest"
-        getTemplate(w, "campaigns_test").ExecuteTemplate(w, "base", params)
+        getTemplate(w, "campaigns_ttt").ExecuteTemplate(w, "base", params)
 }
 
 

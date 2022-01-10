@@ -155,6 +155,7 @@ func (m *MailLog) CacheCampaign(campaign *Campaign) error {
 // the correct headers and body from the campaign and recipient listed in
 // the maillog. We accept the gomail.Message as an argument so that the caller
 // can choose to re-use the message across recipients.
+//Nassim : It must be change
 func (m *MailLog) Generate(msg *gomail.Message) error {
 	r, err := GetResult(m.RId)
 	if err != nil {

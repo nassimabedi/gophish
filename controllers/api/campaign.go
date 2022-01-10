@@ -10,6 +10,7 @@ import (
 	"github.com/gophish/gophish/models"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"fmt"
 )
 
 // Campaigns returns a list of campaigns if requested via GET.
@@ -46,7 +47,8 @@ func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func (as *Server) CampaignsTest(w http.ResponseWriter, r *http.Request) {
+//Begin By Nassim
+func (as *Server) CampaignsTtt(w http.ResponseWriter, r *http.Request) {
         switch {
         case r.Method == "GET":
                 cs, err := models.GetCampaigns(ctx.Get(r, "user_id").(int64))
@@ -56,15 +58,18 @@ func (as *Server) CampaignsTest(w http.ResponseWriter, r *http.Request) {
                 JSONResponse(w, cs, http.StatusOK)
         //POST: Create a new campaign and return it as JSON
         case r.Method == "POST":
+		fmt.Println("POSTCampain111111111111111111111111111111111111111111111")
                 c := models.Campaign{}
                 // Put the request into a campaign
                 err := json.NewDecoder(r.Body).Decode(&c)
                 if err != nil {
+			fmt.Println("err222222222222222222222222222222")
                         JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
                         return
                 }
                 err = models.PostCampaign(&c, ctx.Get(r, "user_id").(int64))
                 if err != nil {
+			fmt.Println("err 33333333333333333333333333333")
                         JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusBadRequest)
                         return
                 }
@@ -76,6 +81,7 @@ func (as *Server) CampaignsTest(w http.ResponseWriter, r *http.Request) {
                 JSONResponse(w, c, http.StatusCreated)
         }
 }
+//End by Nassim
 
 
 // CampaignsSummary returns the summary for the current user's campaigns
