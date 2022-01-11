@@ -40,6 +40,22 @@ var targets = [];
                         name: group.text
                     });
                 })
+                // start by Nassim
+                var template_groups = []
+                $.each($("#targetsTable").DataTable().rows().data(), function (i, target) {
+                    template_groups.push({
+                        template: unescapeHtml(target[0]),
+                        groups: unescapeHtml(target[1])
+                        
+                    })
+                    console.log("==============");
+                    console.log(target[0]);
+                    console.log(target[1]);
+                    // console.log(target[0].text);
+                    // console.log(target[1].text);
+                })
+                // end by Nassim
+
                 // Validate our fields
                 var send_by_date = $("#send_by_date").val()
                 if (send_by_date != "") {
@@ -60,9 +76,13 @@ var targets = [];
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
                     groups: groups,
+                    template_groups:template_groups
                 }
                 // Submit the campaign
-                api.campaigns.post(campaign)
+                
+                api.campaignsttt.post(campaign)
+                
+                // api.nassim.post(campaign)
                     .success(function (data) {
                         resolve()
                         campaign = data
@@ -83,7 +103,7 @@ var targets = [];
             );
         }
         $('button:contains("OK")').on('click', function () {
-            window.location = "/campaigns/" + campaign.id.toString()
+            window.location = "/campaignsttt/" + campaign.id.toString()
         })
     })
 }

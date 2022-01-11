@@ -149,7 +149,7 @@ func (w *DefaultWorker) LaunchCampaign(c models.Campaign) {
 
 //start by Nassim
 // LaunchCampaign starts a campaign
-func (w *DefaultWorker) LaunchCampaignTest(c models.Campaign) {
+func (w *DefaultWorker) LaunchCampaignttt(c models.Campaignttt) {
 	//Nassim It has template ID
 	ms, err := models.GetMailLogsByCampaign(c.Id)
 	if err != nil {
