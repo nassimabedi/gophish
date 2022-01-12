@@ -563,79 +563,108 @@ func PostCampaignttt(c *Campaignttt, uid int64) error {
 	for _,v := range c.TemplateGroups {
 		fmt.Println(v)
 		fmt.Println(v.Template)
+		temp, err := GetTemplateByNameTx(v.Template, uid,tx)
+		if err != nil {
+				log.Error(err)
+				return err
+		} 
+		fmt.Println(temp)
 		fmt.Println(v.Groups)
 		res := strings.Contains(v.Groups, ",")
 		fmt.Println(res) // true
-		// groupList := strings.Split(v.Groups, ",")
-		// GetGroupByName
-		// GetTemplateByName
-	}
-	for _, g := range c.Groups {
-		// Insert a result for each target in the group
-		for _, t := range g.Targets {
-			// Remove duplicate results - we should only
-			// send emails to unique email addresses.
-			if _, ok := resultMap[t.Email]; ok {
-				continue
-			}
-			resultMap[t.Email] = true
-			sendDate := c.generateSendDate(recipientIndex, totalRecipients)
-			r := &Result{
-				BaseRecipient: BaseRecipient{
-					Email:     t.Email,
-					Position:  t.Position,
-					FirstName: t.FirstName,
-					LastName:  t.LastName,
-				},
-				Status:       StatusScheduled,
-				CampaignId:   c.Id,
-				UserId:       c.UserId,
-				SendDate:     sendDate,
-				Reported:     false,
-				ModifiedDate: c.CreatedDate,
-			}
-			err = r.GenerateId(tx)
-			if err != nil {
-				log.Error(err)
-				tx.Rollback()
-				return err
-			}
-			processing := false
-			if r.SendDate.Before(c.CreatedDate) || r.SendDate.Equal(c.CreatedDate) {
-				r.Status = StatusSending
-				processing = true
-			}
-			err = tx.Save(r).Error
-			if err != nil {
+		groupList := strings.Split(v.Groups, ",")
+		
+		totalRecipients := 0
+		// var groups  []Group
+		for i,group := range groupList {
+			fmt.Println("---->>>", group)
+			//maybe added on top for pre loop!
+			// recipientIndex := 0
+			//TODO
+			// c.Groups[i], err = GetGroupByName(group, uid)
+			c.Groups[i], err = GetGroupByNameTx(group, uid,tx)
+			// aa, err := GetGroupByName("Group1", uid)
+			if err == gorm.ErrRecordNotFound {
 				log.WithFields(logrus.Fields{
-					"email": t.Email,
-				}).Errorf("error creating result: %v", err)
-				tx.Rollback()
-				return err
+						"group": group,
+				}).Error("Group does not exist")
+				return ErrGroupNotFound
+			} else if err != nil {
+					log.Error(err)
+					return err
 			}
-			c.Results = append(c.Results, *r)
-			log.WithFields(logrus.Fields{
-				"email":     r.Email,
-				"send_date": sendDate,
-			}).Debug("creating maillog")
-			m := &MailLog{
-				UserId:     c.UserId,
-				CampaignId: c.Id,
-				RId:        r.RId,
-				SendDate:   sendDate,
-				Processing: processing,
-			}
-			err = tx.Save(m).Error
-			if err != nil {
+			totalRecipients += len(c.Groups[i].Targets)
+			for _, t := range c.Groups[i].Targets {
+				fmt.Println("9999999999999999999999")
+				fmt.Println(t)
+				// Remove duplicate results - we should only
+				// send emails to unique email addresses.
+				if _, ok := resultMap[t.Email]; ok {
+						continue
+				}
+				resultMap[t.Email] = true
+				sendDate := c.generateSendDate(recipientIndex, totalRecipients)
+				fmt.Println(sendDate)
+				r := &Result{
+						BaseRecipient: BaseRecipient{
+								Email:     t.Email,
+								Position:  t.Position,
+								FirstName: t.FirstName,
+								LastName:  t.LastName,
+						},
+						Status:       StatusScheduled,
+						CampaignId:   c.Id,
+						UserId:       c.UserId,
+						SendDate:     sendDate,
+						Reported:     false,
+						ModifiedDate: c.CreatedDate,
+				}
+				err = r.GenerateId(tx)
+				if err != nil {
+						log.Error(err)
+						tx.Rollback()
+						return err
+				}
+				processing := false
+				if r.SendDate.Before(c.CreatedDate) || r.SendDate.Equal(c.CreatedDate) {
+						r.Status = StatusSending
+						processing = true
+				}
+				err = tx.Save(r).Error
+				if err != nil {
+						log.WithFields(logrus.Fields{
+								"email": t.Email,
+						}).Errorf("error creating result: %v", err)
+						tx.Rollback()
+						return err
+				}
+				c.Results = append(c.Results, *r)
 				log.WithFields(logrus.Fields{
-					"email": t.Email,
-				}).Errorf("error creating maillog entry: %v", err)
-				tx.Rollback()
-				return err
+						"email":     r.Email,
+						"send_date": sendDate,
+				}).Debug("creating maillog")
+
+				m := &MailLog{
+						UserId:     c.UserId,
+						CampaignId: c.Id,
+						RId:        r.RId,
+						SendDate:   sendDate,
+						Processing: processing,
+						TemplateId: temp.Id,
+				}
+				err = tx.Save(m).Error
+				if err != nil {
+						log.WithFields(logrus.Fields{
+								"email": t.Email,
+						}).Errorf("error creating maillog entry: %v", err)
+						tx.Rollback()
+						return err
+				}
 			}
-			recipientIndex++
+
 		}
 	}
+	
 	return tx.Commit().Error
 }
 
