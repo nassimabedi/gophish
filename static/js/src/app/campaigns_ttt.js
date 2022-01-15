@@ -103,7 +103,7 @@ var targets = [];
             );
         }
         $('button:contains("OK")').on('click', function () {
-            window.location = "/campaignsttt/" + campaign.id.toString()
+            window.location = "/campaigns/" + campaign.id.toString()
         })
     })
 }
