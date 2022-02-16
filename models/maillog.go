@@ -331,7 +331,8 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 	}
 
 	msg.SetHeader("To", r.FormatAddress())
-	if c.Template.Text != "" {
+	// if c.Template.Text != "" {
+	if tt.Text != "" {
 		// text, err := ExecuteTemplate(c.Template.Text, ptx)
 		text, err := ExecuteTemplate(tt.Text, ptx)
 		if err != nil {
@@ -339,7 +340,8 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 		}
 		msg.SetBody("text/plain", text)
 	}
-	if c.Template.HTML != "" {
+	// if c.Template.HTML != "" {
+	if tt.HTML != "" {
 		// html, err := ExecuteTemplate(c.Template.HTML, ptx)
 		html, err := ExecuteTemplate(tt.HTML, ptx)
 		if err != nil {
