@@ -122,6 +122,9 @@ var ErrTemplateNotSpecified = errors.New("No email template specified")
 // ErrPageNotSpecified indicates a landing page was not provided for the campaign
 var ErrPageNotSpecified = errors.New("No landing page specified")
 
+// ErrTemplateGroupsNotSpecified indicates on template groups
+var ErrTemplateGroupsNotSpecified = errors.New("No template groups specified")
+
 // ErrSMTPNotSpecified indicates a sending profile was not provided for the campaign
 var ErrSMTPNotSpecified = errors.New("No sending profile specified")
 
@@ -149,10 +152,12 @@ func (c *Campaign) Validate() error {
 	switch {
 	case c.Name == "":
 		return ErrCampaignNameNotSpecified
-	case len(c.Groups) == 0:
-		return ErrGroupNotSpecified
-	case c.Template.Name == "":
-		return ErrTemplateNotSpecified
+	// case len(c.Groups) == 0:
+	// 	return ErrGroupNotSpecified
+	// case c.Template.Name == "":
+	// 	return ErrTemplateNotSpecified
+	case len(c.TemplateGroups) == 0:
+		return ErrTemplateGroupsNotSpecified
 	case c.Page.Name == "":
 		return ErrPageNotSpecified
 	case c.SMTP.Name == "":
@@ -632,21 +637,6 @@ func PostCampaign(c *Campaign, uid int64) error {
 }
 
 // start by Nassim
-// func (r *TemplateGroups) GenerateId(tx *gorm.DB) error {
-// 	// Keep trying until we generate a unique key (shouldn't take more than one or two iterations)
-// 	for {
-// 			rid, err := generateResultId()
-// 			if err != nil {
-// 					return err
-// 			}
-// 			r.RId = rid
-// 			err = tx.Table("results").Where("r_id=?", r.RId).First(&TemplateGroups{}).Error
-// 			if err == gorm.ErrRecordNotFound {
-// 					break
-// 			}
-// 	}
-// 	return nil
-// }
 
 func PostCampaignttt(c *Campaign, uid int64) error {
 
@@ -753,13 +743,12 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	recipientIndex := 0
 	tx := db.Begin()
 	for _, v := range c.TemplateGroups {
-		
+
 		temp, err := GetTemplateByNameTx(v.Template, uid, tx)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
-	
 
 		//=================================>>>>>>>>>>
 		// 	tg := &TemplateGroups{
