@@ -5,14 +5,18 @@ import (
 	"net/http"
 	"strconv"
 
+	"fmt"
 	ctx "github.com/gophish/gophish/context"
 	log "github.com/gophish/gophish/logger"
 	"github.com/gophish/gophish/models"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"fmt"
 )
 
+//api key : 1a91d4d285ecb704e1c66114e736a0766adc3e7e5f590299b5e0cbbd3bc1d923
+
+//[{template1 Group1} {template2 Group1,group2}]
+//&{0 0 campaign6 0001-01-01 00:00:00 +0000 UTC 2022-02-19 16:39:00 +0000 +0000 0001-01-01 00:00:00 +0000 UTC 0001-01-01 00:00:00 +0000 UTC 0 {0 0 template2    0001-01-01 00:00:00 +0000 UTC []} 0 {0 0 landingPage1  false false  0001-01-01 00:00:00 +0000 UTC}  [] [{0 0 Group1 0001-01-01 00:00:00 +0000 UTC []} {0 0 group2 0001-01-01 00:00:00 +0000 UTC []}] [] 0 {0 0  Profile1     false [] 0001-01-01 00:00:00 +0000 UTC}  [{template1 Group1} {template2 Group1,group2}]}
 // Campaigns returns a list of campaigns if requested via GET.
 // If requested via POST, APICampaigns creates a new campaign and returns a reference to it.
 func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
@@ -25,10 +29,11 @@ func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, cs, http.StatusOK)
 	//POST: Create a new campaign and return it as JSON
 	case r.Method == "POST":
-		fmt.Println("####################################################")
 		c := models.Campaign{}
 		// Put the request into a campaign
 		err := json.NewDecoder(r.Body).Decode(&c)
+		fmt.Println(r.Body)
+		fmt.Println(&c)
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
 			return
@@ -46,7 +51,6 @@ func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, c, http.StatusCreated)
 	}
 }
-
 
 // //Begin By Nassim
 // func (as *Server) Campaignsttt(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +92,6 @@ func (as *Server) Campaigns(w http.ResponseWriter, r *http.Request) {
 // }
 //End by Nassim
 
-
 // CampaignsSummary returns the summary for the current user's campaigns
 func (as *Server) CampaignsSummary(w http.ResponseWriter, r *http.Request) {
 	switch {
@@ -127,7 +130,6 @@ func (as *Server) Campaign(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // start by Nassim
 // Campaign returns details about the requested campaign. If the campaign is not
 // valid, APICampaign returns null.
@@ -154,9 +156,6 @@ func (as *Server) Campaignttt(w http.ResponseWriter, r *http.Request) {
 }
 
 // End by Nassim
-
-
-
 
 // CampaignResults returns just the results for a given campaign to
 // significantly reduce the information returned.

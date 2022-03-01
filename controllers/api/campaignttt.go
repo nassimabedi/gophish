@@ -25,20 +25,15 @@ func (as *Server) Campaignsttt(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, cs, http.StatusOK)
 	//POST: Create a new campaign and return it as JSON
 	case r.Method == "POST":
-		log.Infof("POSTCampain111111111111111111111111111111111111111111111")
-		fmt.Println("POSTCampain111111111111111111111111111111111111111111111")
-		// c := models.Campaignttt{}
-                c := models.Campaign{}
+		
+		c := models.Campaign{}
 		// Put the request into a campaign
 		err := json.NewDecoder(r.Body).Decode(&c)
 		if err != nil {
-			fmt.Println("err222222222222222222222222222222")
 			JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
 			return
 		}
-		fmt.Println("================>>>>>>")
-		fmt.Println(&c)
-		fmt.Println("================<<<<<<")
+		
 		err = models.PostCampaignttt(&c, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			fmt.Println("err 33333333333333333333333333333")
