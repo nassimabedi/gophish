@@ -71,9 +71,9 @@ var targets = [];
                     page: {
                         name: $("#page").select2("data")[0].text
                     },
-                    //smtp: {
-                    //    name: $("#profile").select2("data")[0].text
-                    //},
+                    smtp: {
+                        name: $("#profile").select2("data")[0].text
+                    },
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
                     groups: groups,
@@ -352,6 +352,18 @@ function setupOptions() {
                     profile_select.val(profile_s2[0].id)
                     profile_select.trigger('change.select2')
                 }
+
+                // start by Nassim
+                var profile_select1 = $("#profile1.form-control")
+                profile_select1.select2({
+                    placeholder: "Select a Sending Profile",
+                    data: profile_s2,
+                }).select2("val", profile_s2[0]);
+                if (profiles.length === 1) {
+                    profile_select1.val(profile_s2[0].id)
+                    profile_select1.trigger('change.select2')
+                }
+                // end by Nassim
             }
         });
 }
@@ -582,7 +594,7 @@ $(document).ready(function () {
         //     return
         // }
        
-        profileName = $("#profile :selected" ).text()
+        profileName = $("#profile1 :selected" ).text()
         templateName = $("#template :selected" ).text()
         var groupsName = $('#users option:selected').toArray().map(item => item.text).join();
         
