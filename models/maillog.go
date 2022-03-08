@@ -35,6 +35,7 @@ type MailLog struct {
 	CampaignId  int64     `json:"campaign_id"`
 	//Begin by Nassim
 	TemplateId  int64     `json:"template_id"`
+	ProfileId   int64     `json:"profile_id"` 
 	//End by Nassim        
 	RId         string    `json:"id"`
 	SendDate    time.Time `json:"send_date"`
@@ -257,6 +258,8 @@ func (m *MailLog) CacheCampaign(campaign *Campaign) error {
 // 	return nil
 // }
 
+
+
 // change func by Nassim
 func (m *MailLog) Generate(msg *gomail.Message) error {
 	r, err := GetResult(m.RId)
@@ -272,7 +275,15 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 		c = &campaign
 	}
 
-	f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	// start by Nassim
+    smtp , err := GetSMTP(m.ProfileId,m.UserId)
+	if err != nil {
+		return err
+	}
+	// end by Nassim
+
+	// f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	f, err := mail.ParseAddress(smtp.FromAddress)
 	if err != nil {
 		return err
 	}
@@ -296,8 +307,10 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 	}
 	msg.SetHeader("Message-Id", messageID)
 
+	
 	// Parse the customHeader templates
-	for _, header := range c.SMTP.Headers {
+	// for _, header := range c.SMTP.Headers {
+	for _, header := range smtp.Headers {
 		key, err := ExecuteTemplate(header.Key, ptx)
 		if err != nil {
 			log.Warn(err)

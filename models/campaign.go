@@ -42,6 +42,7 @@ type Campaign struct {
 type TemplateGroups struct {
 	Id         int64  `json:"_"`
 	CampaignId int64  `json:"campaign_id"`
+	Profile    string `json:"profile"`
 	Template   string `json:"template"`
 	Groups     string `json:"groups"`
 }
@@ -160,8 +161,8 @@ func (c *Campaign) Validate() error {
 		return ErrTemplateGroupsNotSpecified
 	case c.Page.Name == "":
 		return ErrPageNotSpecified
-	case c.SMTP.Name == "":
-		return ErrSMTPNotSpecified
+	//case c.SMTP.Name == "":
+	//	return ErrSMTPNotSpecified
 	case !c.SendByDate.IsZero() && !c.LaunchDate.IsZero() && c.SendByDate.Before(c.LaunchDate):
 		return ErrInvalidSendByDate
 	}
@@ -665,21 +666,21 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	// Check to make sure all the groups already exist
 	// Also, later we'll need to know the total number of recipients (counting
 	// duplicates is ok for now), so we'll do that here to save a loop.
-	totalRecipients := 0
-	for i, g := range c.Groups {
-		c.Groups[i], err = GetGroupByName(g.Name, uid)
-		if err == gorm.ErrRecordNotFound {
-			log.WithFields(logrus.Fields{
-				"group": g.Name,
-			}).Error("Group does not exist")
-			return ErrGroupNotFound
-		} else if err != nil {
-			log.Error(err)
-			return err
-		}
-		totalRecipients += len(c.Groups[i].Targets)
-	}
-	// fmt.Println("-----------444444444444444")
+	// totalRecipients := 0
+	// for i, g := range c.Groups {
+	// 	c.Groups[i], err = GetGroupByName(g.Name, uid)
+	// 	if err == gorm.ErrRecordNotFound {
+	// 		log.WithFields(logrus.Fields{
+	// 			"group": g.Name,
+	// 		}).Error("Group does not exist")
+	// 		return ErrGroupNotFound
+	// 	} else if err != nil {
+	// 		log.Error(err)
+	// 		return err
+	// 	}
+	// 	totalRecipients += len(c.Groups[i].Targets)
+	// }
+	fmt.Println("-----------444444444444444")
 	// Check to make sure the template exists
 	// t, err := GetTemplateByName(c.Template.Name, uid)
 	// if err == gorm.ErrRecordNotFound {
@@ -706,19 +707,23 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	}
 	c.Page = p
 	c.PageId = p.Id
+
+    //TODO : check for SMTP 
 	// Check to make sure the sending profile exists
-	s, err := GetSMTPByName(c.SMTP.Name, uid)
-	if err == gorm.ErrRecordNotFound {
-		log.WithFields(logrus.Fields{
-			"smtp": c.SMTP.Name,
-		}).Error("Sending profile does not exist")
-		return ErrSMTPNotFound
-	} else if err != nil {
-		log.Error(err)
-		return err
-	}
-	c.SMTP = s
-	c.SMTPId = s.Id
+	// s, err := GetSMTPByName(c.SMTP.Name, uid)
+	// if err == gorm.ErrRecordNotFound {
+	// 	log.WithFields(logrus.Fields{
+	// 		"smtp": c.SMTP.Name,
+	// 	}).Error("Sending profile does not exist")
+	// 	return ErrSMTPNotFound
+	// } else if err != nil {
+	// 	log.Error(err)
+	// 	return err
+	// }
+	// c.SMTP = s
+	// c.SMTPId = s.Id
+
+
 	// Insert into the DB
 	// fmt.Println("-----------44444444444444444444444")
 	// fmt.Println(c.TemplateGroups)
@@ -727,7 +732,6 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	// }
 
 	err = db.Save(c).Error
-	// fmt.Println("-----------55555555555555555555555555---------------")
 	if err != nil {
 		fmt.Println(err)
 		log.Error(err)
@@ -743,12 +747,18 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	recipientIndex := 0
 	tx := db.Begin()
 	for _, v := range c.TemplateGroups {
-
 		temp, err := GetTemplateByNameTx(v.Template, uid, tx)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
+
+		profile, err := GetSMTPByNameTx(v.Profile, uid, tx)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
 
 		//=================================>>>>>>>>>>
 		// 	tg := &TemplateGroups{
@@ -783,7 +793,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 		totalRecipients := 0
 		// var groups  []Group
 		for i, group := range groupList {
-			//fmt.Println("---->>>", group)
+			fmt.Println("---->>>", group)
 			//maybe added on top for pre loop!
 			// recipientIndex := 0
 			//TODO
@@ -857,6 +867,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 					SendDate:   sendDate,
 					Processing: processing,
 					TemplateId: temp.Id,
+					ProfileId: profile.Id,
 				}
 				err = tx.Save(m).Error
 				if err != nil {

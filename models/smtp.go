@@ -161,6 +161,7 @@ func GetSMTP(id int64, uid int64) (SMTP, error) {
 
 // GetSMTPByName returns the SMTP, if it exists, specified by the given name and user_id.
 func GetSMTPByName(n string, uid int64) (SMTP, error) {
+	
 	s := SMTP{}
 	err := db.Where("user_id=? and name=?", uid, n).Find(&s).Error
 	if err != nil {
@@ -173,6 +174,24 @@ func GetSMTPByName(n string, uid int64) (SMTP, error) {
 	}
 	return s, err
 }
+
+// start by Nassim
+func GetSMTPByNameTx(n string, uid int64, tx *gorm.DB) (SMTP, error) {
+	s := SMTP{}
+	err := tx.Where("user_id=? and name=?", uid, n).Find(&s).Error
+	if err != nil {
+		log.Error(err)
+		return s, err
+	}
+	err = tx.Where("smtp_id=?", s.Id).Find(&s.Headers).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Error(err)
+	}
+	return s, err
+}
+// end by Nassim
+
+
 
 // PostSMTP creates a new SMTP in the database.
 func PostSMTP(s *SMTP) error {

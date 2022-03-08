@@ -44,8 +44,9 @@ var targets = [];
                 var template_groups = []
                 $.each($("#targetsTable").DataTable().rows().data(), function (i, target) {
                     template_groups.push({
-                        template: unescapeHtml(target[0]),
-                        groups: unescapeHtml(target[1])
+                        profile : unescapeHtml(target[0]),
+                        template: unescapeHtml(target[1]),
+                        groups: unescapeHtml(target[2])
                         
                     })
                     console.log("==============");
@@ -63,27 +64,30 @@ var targets = [];
                 }
                 campaign = {
                     name: $("#name").val(),
-                    template: {
-                        name: $("#template").select2("data")[0].text
-                    },
+                    //template: {
+                    //    name: $("#template").select2("data")[0].text
+                    //},
                     url: $("#url").val(),
                     page: {
                         name: $("#page").select2("data")[0].text
                     },
-                    smtp: {
-                        name: $("#profile").select2("data")[0].text
-                    },
+                    //smtp: {
+                    //    name: $("#profile").select2("data")[0].text
+                    //},
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
                     groups: groups,
                     template_groups:template_groups
                 }
                 // Submit the campaign
+                console.log("==============ppppppppppppppppp");
                 
-                api.campaignsttt.post(campaign)
+                // api.campaignsttt.post(campaign)
+                api.campaigns.post(campaign)
                 
                 // api.nassim.post(campaign)
                     .success(function (data) {
+                        console.log("==============>>>>>>>>>>>>>.after post");
                         resolve()
                         campaign = data
                     })
@@ -145,11 +149,12 @@ var targets = [];
 
 
 
-function addTarget(templateInput, GroupInput) {
+function addTarget(profileInput, templateInput, GroupInput) {
     // Create new data row.
     // var email = escapeHtml(emailInput).toLowerCase();
     var email = 'test@test.com';
     var newRow = [
+        escapeHtml(profileInput),
         escapeHtml(templateInput),
         escapeHtml(GroupInput),        
         '<span style="cursor:pointer;"><i class="fa fa-trash-o"></i></span>'
@@ -577,10 +582,12 @@ $(document).ready(function () {
         //     return
         // }
        
+        profileName = $("#profile :selected" ).text()
         templateName = $("#template :selected" ).text()
         var groupsName = $('#users option:selected').toArray().map(item => item.text).join();
         
         addTarget(
+            profileName,
             templateName,
             groupsName
         );

@@ -111,7 +111,7 @@
                             <input type="text" class="form-control" id="send_by_date" autocomplete="random-data"/> <!--Chrome ignores autocomplete="off".-->
                         </div>
                     </div>
-                    <label class="control-label" for="profile">Sending Profile:</label>
+                    <!--<label class="control-label" for="profile">Sending Profile:</label>
                     <div class="input-group">
                         <select class="form-control" placeholder="Sending Profile" id="profile" />
                         <option></option>
@@ -121,19 +121,29 @@
                                 class="btn btn-primary button">
                                 <i class="fa fa-envelope"></i> Send Test Email</button>
                         </span>
-                    </div>
+                    </div>-->
                     <!--<label class="control-label" for="users">Groups:</label>
                     <select class="form-control" id="users" multiple="multiple"></select>-->
 		    <!-- Start by Nassim -->
                     <br><br>
                    <div class="row">
                         <form id="targetForm">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
+                                <select class="form-control" placeholder="Sending Profile" id="profile" />
+                                <option></option>
+                                </select>
+                                <!--<span class="input-group-btn">
+                                    <button type="button" data-toggle="modal" data-backdrop="static" data-target="#sendTestEmailModal"
+                                        class="btn btn-primary button">
+                                        <i class="fa fa-envelope"></i> Send Test Email</button>
+                                </span>-->
+                            </div>
+                            <div class="col-sm-3">
                                 <select class="form-control" placeholder="Template Name" id="template" />
                                 <option></option>
                                 </select>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <select class="form-control" id="users" multiple="multiple"></select>
                             </div>
                             <div class="col-sm-1">
@@ -146,6 +156,7 @@
                     <table id="targetsTable" class="table table-hover table-striped table-condensed">
                         <thead>
                             <tr>
+                                <th>Profile</th>
                                 <th>Template</th>
                                 <th>Group</th>                                
                                 <th class="no-sort"></th>
