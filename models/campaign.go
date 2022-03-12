@@ -710,18 +710,18 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 
     //TODO : check for SMTP 
 	// Check to make sure the sending profile exists
-	// s, err := GetSMTPByName(c.SMTP.Name, uid)
-	// if err == gorm.ErrRecordNotFound {
-	// 	log.WithFields(logrus.Fields{
-	// 		"smtp": c.SMTP.Name,
-	// 	}).Error("Sending profile does not exist")
-	// 	return ErrSMTPNotFound
-	// } else if err != nil {
-	// 	log.Error(err)
-	// 	return err
-	// }
-	// c.SMTP = s
-	// c.SMTPId = s.Id
+	s, err := GetSMTPByName(c.SMTP.Name, uid)
+	if err == gorm.ErrRecordNotFound {
+		log.WithFields(logrus.Fields{
+			"smtp": c.SMTP.Name,
+		}).Error("Sending profile does not exist")
+		return ErrSMTPNotFound
+	} else if err != nil {
+		log.Error(err)
+		return err
+	}
+	c.SMTP = s
+	c.SMTPId = s.Id
 
 
 	// Insert into the DB

@@ -279,15 +279,15 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========00000000000000",err)
 
 	// start by Nassim
-    smtp , err := GetSMTP(m.ProfileId,m.UserId)
-	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========11111111111111",err, smtp.FromAddress)
-	if err != nil {
-		return err
-	}
+    // smtp , err := GetSMTP(m.ProfileId,m.UserId)
+	// fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========11111111111111",err, smtp.FromAddress)
+	// if err != nil {
+	// 	return err
+	// }
 	// end by Nassim
 
-	// f, err := mail.ParseAddress(c.SMTP.FromAddress)
-	f, err := mail.ParseAddress(smtp.FromAddress)
+	f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	// f, err := mail.ParseAddress(smtp.FromAddress)
 	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========2222222",err)
 	if err != nil {
 		return err
@@ -314,8 +314,8 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 
 	
 	// Parse the customHeader templates
-	// for _, header := range c.SMTP.Headers {
-	for _, header := range smtp.Headers {
+	for _, header := range c.SMTP.Headers {
+	// for _, header := range smtp.Headers {
 		key, err := ExecuteTemplate(header.Key, ptx)
 		if err != nil {
 			log.Warn(err)
