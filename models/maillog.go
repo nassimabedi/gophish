@@ -273,7 +273,16 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 		c = &campaign
 	}
 
-	f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	// start by Nassim
+	 smtp , err := GetSMTP(m.ProfileId,m.UserId)
+	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========11111111111111",err, smtp.FromAddress)
+	if err != nil {
+		return err
+	}
+	// end by Nassim
+
+	// f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	f, err := mail.ParseAddress(smtp.FromAddress)
 	if err != nil {
 		return err
 	}
@@ -298,7 +307,8 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 	msg.SetHeader("Message-Id", messageID)
 
 	// Parse the customHeader templates
-	for _, header := range c.SMTP.Headers {
+	// for _, header := range c.SMTP.Headers {
+	for _, header := range smtp.Headers {
 		key, err := ExecuteTemplate(header.Key, ptx)
 		if err != nil {
 			log.Warn(err)
