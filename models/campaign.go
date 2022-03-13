@@ -398,14 +398,14 @@ func GetCampaignMailContext(id int64, uid int64) (Campaign, error) {
 	if err != nil {
 		return c, err
 	}
-	// err = db.Table("smtp").Where("id=?", c.SMTPId).Find(&c.SMTP).Error
-	// if err != nil {
-	// 	return c, err
-	// }
-	// err = db.Where("smtp_id=?", c.SMTP.Id).Find(&c.SMTP.Headers).Error
-	// if err != nil && err != gorm.ErrRecordNotFound {
-	// 	return c, err
-	// }
+	err = db.Table("smtp").Where("id=?", c.SMTPId).Find(&c.SMTP).Error
+	if err != nil {
+		return c, err
+	}
+	err = db.Where("smtp_id=?", c.SMTP.Id).Find(&c.SMTP.Headers).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return c, err
+	}
 	err = db.Table("templates").Where("id=?", c.TemplateId).Find(&c.Template).Error
 	if err != nil {
 		return c, err
