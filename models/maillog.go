@@ -35,6 +35,7 @@ type MailLog struct {
 	CampaignId  int64     `json:"campaign_id"`
 	//Begin by Nassim
 	TemplateId  int64     `json:"template_id"`
+	ProfileId   int64     `json:"profile_id"`
 	//End by Nassim        
 	RId         string    `json:"id"`
 	SendDate    time.Time `json:"send_date"`

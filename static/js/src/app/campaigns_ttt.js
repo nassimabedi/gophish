@@ -44,8 +44,9 @@ var targets = [];
                 var template_groups = []
                 $.each($("#targetsTable").DataTable().rows().data(), function (i, target) {
                     template_groups.push({
-                        template: unescapeHtml(target[0]),
-                        groups: unescapeHtml(target[1])
+                        profile : unescapeHtml(target[0]),
+                        template: unescapeHtml(target[1]),
+                        groups: unescapeHtml(target[2])
                         
                     })
                     console.log("==============");
@@ -145,11 +146,12 @@ var targets = [];
 
 
 
-function addTarget(templateInput, GroupInput) {
+function addTarget(profileInput, templateInput, GroupInput) {
     // Create new data row.
     // var email = escapeHtml(emailInput).toLowerCase();
     var email = 'test@test.com';
     var newRow = [
+        escapeHtml(profileInput),
         escapeHtml(templateInput),
         escapeHtml(GroupInput),        
         '<span style="cursor:pointer;"><i class="fa fa-trash-o"></i></span>'
@@ -347,6 +349,18 @@ function setupOptions() {
                     profile_select.val(profile_s2[0].id)
                     profile_select.trigger('change.select2')
                 }
+
+                // start by Nassim
+                var profile_select1 = $("#profile1.form-control")
+                profile_select1.select2({
+                    placeholder: "Select a Sending Profile",
+                    data: profile_s2,
+                }).select2("val", profile_s2[0]);
+                if (profiles.length === 1) {
+                    profile_select1.val(profile_s2[0].id)
+                    profile_select1.trigger('change.select2')
+                }
+                // end by Nassim
             }
         });
 }
@@ -577,10 +591,12 @@ $(document).ready(function () {
         //     return
         // }
        
+        profileName = $("#profile1 :selected" ).text()
         templateName = $("#template :selected" ).text()
         var groupsName = $('#users option:selected').toArray().map(item => item.text).join();
         
         addTarget(
+            profileName,
             templateName,
             groupsName
         );

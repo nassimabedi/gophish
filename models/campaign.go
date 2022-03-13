@@ -42,6 +42,7 @@ type Campaign struct {
 type TemplateGroups struct {
 	Id         int64  `json:"_"`
 	CampaignId int64  `json:"campaign_id"`
+	Profile    string `json:"profile"`
 	Template   string `json:"template"`
 	Groups     string `json:"groups"`
 }
@@ -759,6 +760,12 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 			log.Error(err)
 			return err
 		}
+
+		profile, err := GetSMTPByNameTx(v.Profile, uid, tx)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
 	
 
 		//=================================>>>>>>>>>>
@@ -868,6 +875,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 					SendDate:   sendDate,
 					Processing: processing,
 					TemplateId: temp.Id,
+					ProfileId: profile.Id,
 				}
 				err = tx.Save(m).Error
 				if err != nil {
