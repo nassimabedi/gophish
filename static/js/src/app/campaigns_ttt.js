@@ -71,9 +71,9 @@ var targets = [];
                     page: {
                         name: $("#page").select2("data")[0].text
                     },
-                    smtp: {
-                       name: $("#profile").select2("data")[0].text
-                    },
+                    // smtp: {
+                    //    name: $("#profile").select2("data")[0].text
+                    // },
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
                     groups: groups,

@@ -398,14 +398,14 @@ func GetCampaignMailContext(id int64, uid int64) (Campaign, error) {
 	if err != nil {
 		return c, err
 	}
-	err = db.Table("smtp").Where("id=?", c.SMTPId).Find(&c.SMTP).Error
-	if err != nil {
-		return c, err
-	}
-	err = db.Where("smtp_id=?", c.SMTP.Id).Find(&c.SMTP.Headers).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return c, err
-	}
+	// err = db.Table("smtp").Where("id=?", c.SMTPId).Find(&c.SMTP).Error
+	// if err != nil {
+	// 	return c, err
+	// }
+	// err = db.Where("smtp_id=?", c.SMTP.Id).Find(&c.SMTP.Headers).Error
+	// if err != nil && err != gorm.ErrRecordNotFound {
+	// 	return c, err
+	// }
 	err = db.Table("templates").Where("id=?", c.TemplateId).Find(&c.Template).Error
 	if err != nil {
 		return c, err
@@ -718,18 +718,18 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	c.Page = p
 	c.PageId = p.Id
 	// Check to make sure the sending profile exists
-	s, err := GetSMTPByName(c.SMTP.Name, uid)
-	if err == gorm.ErrRecordNotFound {
-		log.WithFields(logrus.Fields{
-			"smtp": c.SMTP.Name,
-		}).Error("Sending profile does not exist")
-		return ErrSMTPNotFound
-	} else if err != nil {
-		log.Error(err)
-		return err
-	}
-	c.SMTP = s
-	c.SMTPId = s.Id
+	// s, err := GetSMTPByName(c.SMTP.Name, uid)
+	// if err == gorm.ErrRecordNotFound {
+	// 	log.WithFields(logrus.Fields{
+	// 		"smtp": c.SMTP.Name,
+	// 	}).Error("Sending profile does not exist")
+	// 	return ErrSMTPNotFound
+	// } else if err != nil {
+	// 	log.Error(err)
+	// 	return err
+	// }
+	// c.SMTP = s
+	// c.SMTPId = s.Id
 	// Insert into the DB
 	// fmt.Println("-----------44444444444444444444444")
 	// fmt.Println(c.TemplateGroups)
