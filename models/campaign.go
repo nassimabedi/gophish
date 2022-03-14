@@ -150,10 +150,10 @@ func (c *Campaign) Validate() error {
 	switch {
 	case c.Name == "":
 		return ErrCampaignNameNotSpecified
-	case len(c.Groups) == 0:
-		return ErrGroupNotSpecified
-	case c.Template.Name == "":
-		return ErrTemplateNotSpecified
+	// case len(c.Groups) == 0:
+	// 	return ErrGroupNotSpecified
+	// case c.Template.Name == "":
+	// 	return ErrTemplateNotSpecified
 	case c.Page.Name == "":
 		return ErrPageNotSpecified
 	//case c.SMTP.Name == "":
@@ -676,20 +676,20 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	// Check to make sure all the groups already exist
 	// Also, later we'll need to know the total number of recipients (counting
 	// duplicates is ok for now), so we'll do that here to save a loop.
-	totalRecipients := 0
-	for i, g := range c.Groups {
-		c.Groups[i], err = GetGroupByName(g.Name, uid)
-		if err == gorm.ErrRecordNotFound {
-			log.WithFields(logrus.Fields{
-				"group": g.Name,
-			}).Error("Group does not exist")
-			return ErrGroupNotFound
-		} else if err != nil {
-			log.Error(err)
-			return err
-		}
-		totalRecipients += len(c.Groups[i].Targets)
-	}
+	// totalRecipients := 0
+	// for i, g := range c.Groups {
+	// 	c.Groups[i], err = GetGroupByName(g.Name, uid)
+	// 	if err == gorm.ErrRecordNotFound {
+	// 		log.WithFields(logrus.Fields{
+	// 			"group": g.Name,
+	// 		}).Error("Group does not exist")
+	// 		return ErrGroupNotFound
+	// 	} else if err != nil {
+	// 		log.Error(err)
+	// 		return err
+	// 	}
+	// 	totalRecipients += len(c.Groups[i].Targets)
+	// }
 	// fmt.Println("-----------444444444444444")
 	// Check to make sure the template exists
 	// t, err := GetTemplateByName(c.Template.Name, uid)
@@ -799,14 +799,16 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 		groupList := strings.Split(v.Groups, ",")
 
 		totalRecipients := 0
-		// var groups  []Group
+		lenGroupList := len(groupList)
+		// var Groups  [lenGroupList]Group
+		Groups := make([]Group, lenGroupList)
 		for i, group := range groupList {
 			//fmt.Println("---->>>", group)
 			//maybe added on top for pre loop!
 			// recipientIndex := 0
 			//TODO
 			// c.Groups[i], err = GetGroupByName(group, uid)
-			c.Groups[i], err = GetGroupByNameTx(group, uid, tx)
+			Groups[i], err = GetGroupByNameTx(group, uid, tx)
 			// aa, err := GetGroupByName("Group1", uid)
 			if err == gorm.ErrRecordNotFound {
 				log.WithFields(logrus.Fields{
@@ -817,8 +819,8 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 				log.Error(err)
 				return err
 			}
-			totalRecipients += len(c.Groups[i].Targets)
-			for _, t := range c.Groups[i].Targets {
+			totalRecipients += len(Groups[i].Targets)
+			for _, t := range Groups[i].Targets {
 				// fmt.Println("9999999999999999999999")
 				// fmt.Println(t)
 				// Remove duplicate results - we should only
