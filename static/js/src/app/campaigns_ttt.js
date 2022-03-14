@@ -49,13 +49,10 @@ var targets = [];
                         groups: unescapeHtml(target[2])
                         
                     })
-                    console.log("==============");
-                    console.log(target[0]);
-                    console.log(target[1]);
-                    // console.log(target[0].text);
                     // console.log(target[1].text);
                 })
                 // end by Nassim
+               
 
                 // Validate our fields
                 var send_by_date = $("#send_by_date").val()
@@ -72,7 +69,8 @@ var targets = [];
                         name: $("#page").select2("data")[0].text
                     },
                     smtp: {
-                       name: $("#profile").select2("data")[0].text
+                    //    name: $("#profile").select2("data")[0].text
+                       name: template_groups[0].profile
                     },
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
