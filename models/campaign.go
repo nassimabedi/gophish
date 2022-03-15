@@ -127,7 +127,7 @@ var ErrPageNotSpecified = errors.New("No landing page specified")
 var ErrSMTPNotSpecified = errors.New("No sending profile specified")
 
 // ErrTemplateNotFound indicates the template specified does not exist in the database
-var ErrTemplateNotFound = errors.New("Template not found")
+var ErrTemplateNotFound = errors.New("Template not founddddddd")
 
 // ErrGroupNotFound indicates a group specified by the user does not exist in the database
 var ErrGroupNotFound = errors.New("Group not found")
@@ -510,6 +510,8 @@ func PostCampaign(c *Campaign, uid int64) error {
 		}
 		totalRecipients += len(c.Groups[i].Targets)
 	}
+
+	fmt.Println("===============MAIN====================")
 	// Check to make sure the template exists
 	t, err := GetTemplateByName(c.Template.Name, uid)
 	if err == gorm.ErrRecordNotFound {
