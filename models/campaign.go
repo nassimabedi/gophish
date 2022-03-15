@@ -720,24 +720,24 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	c.Page = p
 	c.PageId = p.Id
 	// Check to make sure the sending profile exists
-	// s, err := GetSMTPByName(c.SMTP.Name, uid)
-	// if err == gorm.ErrRecordNotFound {
-	// 	log.WithFields(logrus.Fields{
-	// 		"smtp": c.SMTP.Name,
-	// 	}).Error("Sending profile does not exist")
-	// 	return ErrSMTPNotFound
-	// } else if err != nil {
-	// 	log.Error(err)
-	// 	return err
-	// }
-	// c.SMTP = s
-	// c.SMTPId = s.Id
-	// Insert into the DB
-	// fmt.Println("-----------44444444444444444444444")
-	// fmt.Println(c.TemplateGroups)
-	// for _,v := range c.TemplateGroups {
-	// 	fmt.Println("=========>>>>>.....",v.Template,v.Groups)
-	// }
+	s, err := GetSMTPByName(c.SMTP.Name, uid)
+	if err == gorm.ErrRecordNotFound {
+		log.WithFields(logrus.Fields{
+			"smtp": c.SMTP.Name,
+		}).Error("Sending profile does not exist")
+		return ErrSMTPNotFound
+	} else if err != nil {
+		log.Error(err)
+		return err
+	}
+	c.SMTP = s
+	c.SMTPId = s.Id
+	Insert into the DB
+	fmt.Println("-----------44444444444444444444444")
+	fmt.Println(c.TemplateGroups)
+	for _,v := range c.TemplateGroups {
+		fmt.Println("=========>>>>>.....",v.Template,v.Groups)
+	}
 
 	err = db.Save(c).Error
 	// fmt.Println("-----------55555555555555555555555555---------------")
