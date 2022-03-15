@@ -732,7 +732,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	}
 	c.SMTP = s
 	c.SMTPId = s.Id
-	Insert into the DB
+	// Insert into the DB
 	fmt.Println("-----------44444444444444444444444")
 	fmt.Println(c.TemplateGroups)
 	for _,v := range c.TemplateGroups {
