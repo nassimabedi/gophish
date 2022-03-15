@@ -275,7 +275,7 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 
 	// start by Nassim
 	 smtp , err := GetSMTP(m.ProfileId,m.UserId)
-	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========11111111111111",err, smtp.FromAddress)
+	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========11111111111111",err,m.ProfileId, m.UserId, smtp.FromAddress)
 	if err != nil {
 		return err
 	}
