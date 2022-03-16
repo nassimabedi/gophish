@@ -653,11 +653,14 @@ func PostCampaign(c *Campaign, uid int64) error {
 
 func PostCampaignttt(c *Campaign, uid int64) error {
 
+	fmt.Println("1111111111111111111111============================")
 	err := c.Validate()
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+
+	
 
 	// Fill in the details
 	c.UserId = uid
@@ -675,6 +678,8 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	if c.LaunchDate.Before(c.CreatedDate) || c.LaunchDate.Equal(c.CreatedDate) {
 		c.Status = CampaignInProgress
 	}
+
+	fmt.Println("222222222222222222222============================")
 	// Check to make sure all the groups already exist
 	// Also, later we'll need to know the total number of recipients (counting
 	// duplicates is ok for now), so we'll do that here to save a loop.
@@ -707,6 +712,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	// c.Template = t
 	// c.TemplateId = t.Id
 	// Check to make sure the page exists
+
 	p, err := GetPageByName(c.Page.Name, uid)
 	if err == gorm.ErrRecordNotFound {
 		log.WithFields(logrus.Fields{
@@ -719,6 +725,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	}
 	c.Page = p
 	c.PageId = p.Id
+	fmt.Println("3333333333333333333333============================")
 	// Check to make sure the sending profile exists
 	s, err := GetSMTPByName(c.SMTP.Name, uid)
 	if err == gorm.ErrRecordNotFound {
@@ -740,13 +747,13 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	}
 
 	err = db.Save(c).Error
-	// fmt.Println("-----------55555555555555555555555555---------------")
+	fmt.Println("-----------55555555555555555555555555---------------")
 	if err != nil {
 		fmt.Println(err)
 		log.Error(err)
 		return err
 	}
-	// fmt.Println("-----------666666666666666666666666666")
+	fmt.Println("-----------666666666666666666666666666")
 	err = AddEvent(&Event{Message: "Campaign Created"}, c.Id)
 	if err != nil {
 		log.Error(err)
@@ -755,6 +762,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	resultMap := make(map[string]bool)
 	recipientIndex := 0
 	tx := db.Begin()
+	fmt.Println("-----------777777777777777777")
 	for _, v := range c.TemplateGroups {
 		
 		temp, err := GetTemplateByNameTx(v.Template, uid, tx)
@@ -763,11 +771,14 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 			return err
 		}
 
+		fmt.Println("-----------888888888888888888888")
 		profile, err := GetSMTPByNameTx(v.Profile, uid, tx)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
+
+		fmt.Println("-----------99999999999999999999999999")
 	
 
 		//=================================>>>>>>>>>>
@@ -823,7 +834,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 			}
 			totalRecipients += len(Groups[i].Targets)
 			for _, t := range Groups[i].Targets {
-				// fmt.Println("9999999999999999999999")
+				fmt.Println("==================jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
 				// fmt.Println(t)
 				// Remove duplicate results - we should only
 				// send emails to unique email addresses.
@@ -847,17 +858,20 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 					Reported:     false,
 					ModifiedDate: c.CreatedDate,
 				}
+				fmt.Println("==================kkkkkkkkkkkkkkkkkkkkkk")
 				err = r.GenerateId(tx)
 				if err != nil {
 					log.Error(err)
 					tx.Rollback()
 					return err
 				}
+				fmt.Println("==================lllllllllllllllllllllll")
 				processing := false
 				if r.SendDate.Before(c.CreatedDate) || r.SendDate.Equal(c.CreatedDate) {
 					r.Status = StatusSending
 					processing = true
 				}
+				fmt.Println("==================mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
 				err = tx.Save(r).Error
 				if err != nil {
 					log.WithFields(logrus.Fields{
@@ -882,6 +896,7 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 					ProfileId: profile.Id,
 				}
 				err = tx.Save(m).Error
+				fmt.Println("==================oooooooooooooooooooooooooooooooooo")
 				if err != nil {
 					log.WithFields(logrus.Fields{
 						"email": t.Email,
