@@ -2,14 +2,14 @@
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="row">
         <h1 class="page-header">
-            Campaigns
+            Campaigns Test
         </h1>
     </div>
     <div id="flashes" class="row"></div>
     <div class="row">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-backdrop="static" data-target="#modal"
             onclick="edit('new')">
-            <i class="fa fa-plus"></i> New Campaign</button>
+            <i class="fa fa-plus"></i> New Campaign Test</button>
     </div>
     &nbsp;
 
@@ -87,10 +87,10 @@
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" class="form-control" id="name" placeholder="Campaign name" autofocus>
-                    <label class="control-label" for="template">Email Template:</label>
+                    <!--<label class="control-label" for="template">Email Template:</label>
                     <select class="form-control" placeholder="Template Name" id="template" />
                     <option></option>
-                    </select>
+                    </select>-->
                     <label class="control-label" for="page">Landing Page:</label>
                     <select class="form-control" placeholder="Landing Page" id="page" />
                     <option></option>
@@ -122,10 +122,42 @@
                                 <i class="fa fa-envelope"></i> Send Test Email</button>
                         </span>
                     </div>
-                    <label class="control-label" for="users">Groups:</label>
-                    <select class="form-control" id="users" multiple="multiple"></select>
+                    <!--<label class="control-label" for="users">Groups:</label>
+                    <select class="form-control" id="users" multiple="multiple"></select>-->
+		            <!-- Start by Nassim -->
+                    <br><br>
+                   <div class="row">
+                        <form id="targetForm">
+                            <div class="col-sm-4">
+                                <select class="form-control" placeholder="Template Name" id="template" />
+                                <option></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="users" multiple="multiple"></select>
+                            </div>
+                            <div class="col-sm-1">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fa fa-plus"></i> Add</button>
+                            </div>
+                        </form>
+                    </div>
+                    <br />
+                    <table id="targetsTable" class="table table-hover table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Template</th>
+                                <th>Group</th>                                
+                                <th class="no-sort"></th>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+		   <!-- End by Nassim -->
+
                 </div>
             </div>
+	    
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" onclick="dismiss()">Close</button>
                 <button type="button" id="launchButton" class="btn btn-primary" onclick="launch()">
@@ -175,5 +207,7 @@
     </div>
 </div>
 {{end}} {{define "scripts"}}
-<script src="/js/dist/app/campaigns.min.js"></script>
+<!-- start by Nassim-->
+<script src="/js/src/app/campaigns.js"></script>
+<!-- end by Nassim -->
 {{end}}

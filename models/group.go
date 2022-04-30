@@ -190,6 +190,33 @@ func GetGroupByName(n string, uid int64) (Group, error) {
 	return g, err
 }
 
+
+//start by Nassim
+
+func GetGroupByNameTx(n string, uid int64, tx *gorm.DB) (Group, error) {
+	g := Group{}
+	// err := tx.Where("user_id=? and name=?", uid, n).Find(&g).Error
+	err := tx.Table("groups").Where("user_id=? and name=?", uid, n).First(&g).Error
+	if err != nil {
+		log.Error(err)
+		return g, err
+	}
+
+	g.Targets, err = GetTargetsTx(g.Id, tx)
+	if err != nil {
+		log.Error(err)
+	}
+	return g, err
+}
+
+func GetTargetsTx(gid int64, tx *gorm.DB) ([]Target, error) {
+	ts := []Target{}
+	err := tx.Table("targets").Select("targets.id, targets.email, targets.first_name, targets.last_name, targets.position").Joins("left join group_targets gt ON targets.id = gt.target_id").Where("gt.group_id=?", gid).Scan(&ts).Error
+	return ts, err
+}
+
+//end by Nassim
+
 // PostGroup creates a new group in the database.
 func PostGroup(g *Group) error {
 	if err := g.Validate(); err != nil {

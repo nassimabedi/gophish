@@ -182,3 +182,26 @@ func DeleteTemplate(id int64, uid int64) error {
 	}
 	return nil
 }
+
+//start by Nassim
+func GetTemplateByNameTx (n string, uid int64,tx *gorm.DB) (Template, error) {
+	t := Template{}
+	err := tx.Where("user_id=? and name=?", uid, n).Find(&t).Error
+	if err != nil {
+		log.Error(err)
+		return t, err
+	}
+
+	// Get Attachments
+	err = tx.Where("template_id=?", t.Id).Find(&t.Attachments).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Error(err)
+		return t, err
+	}
+	if err == nil && len(t.Attachments) == 0 {
+		t.Attachments = make([]Attachment, 0)
+	}
+	return t, err
+}
+
+//end by Nassim

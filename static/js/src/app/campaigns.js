@@ -11,8 +11,16 @@ var labels = {
 var campaigns = []
 var campaign = {}
 
+//start by Nassim
+var targets = []
+//end by Nassim
+
 // Launch attempts to POST to /campaigns/
 function launch() {
+    //start by Nassim
+var targets = [];
+//end by Nassim
+
     Swal.fire({
         title: "Are you sure?",
         text: "This will schedule the campaign to be launched.",
@@ -32,6 +40,22 @@ function launch() {
                         name: group.text
                     });
                 })
+                // start by Nassim
+                var template_groups = []
+                $.each($("#targetsTable").DataTable().rows().data(), function (i, target) {
+                    template_groups.push({
+                        template: unescapeHtml(target[0]),
+                        groups: unescapeHtml(target[1])
+                        
+                    })
+                    console.log("==============");
+                    console.log(target[0]);
+                    console.log(target[1]);
+                    // console.log(target[0].text);
+                    // console.log(target[1].text);
+                })
+                // end by Nassim
+
                 // Validate our fields
                 var send_by_date = $("#send_by_date").val()
                 if (send_by_date != "") {
@@ -52,9 +76,13 @@ function launch() {
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
                     groups: groups,
+                    template_groups:template_groups
                 }
                 // Submit the campaign
+                
                 api.campaigns.post(campaign)
+                
+                // api.nassim.post(campaign)
                     .success(function (data) {
                         resolve()
                         campaign = data
@@ -79,6 +107,48 @@ function launch() {
         })
     })
 }
+
+//start by Nassim
+
+function addTarget(templateInput, GroupInput) {
+    // Create new data row.
+    // var email = escapeHtml(emailInput).toLowerCase();
+    var email = 'test@test.com';
+    var newRow = [
+        escapeHtml(templateInput),
+        escapeHtml(GroupInput),        
+        '<span style="cursor:pointer;"><i class="fa fa-trash-o"></i></span>'
+    ];
+
+    // Check table to see if email already exists.
+    // $.noConflict();
+    // var targets = $('#targetsTable')
+    targets = $("#targetsTable").dataTable({
+        destroy: true, // Destroy any other instantiated table - http://datatables.net/manual/tech-notes/3#destroy
+        columnDefs: [{
+            orderable: false,
+            targets: "no-sort"
+        }]
+    })
+    var targetsTable = targets.DataTable();
+    var existingRowIndex = targetsTable
+        .column(2, {
+            order: "index"
+        }) // Email column has index of 2
+        .data()
+        .indexOf(email);
+    // Update or add new row as necessary.
+    if (existingRowIndex >= 0) {
+        targetsTable
+            .row(existingRowIndex, {
+                order: "index"
+            })
+            .data(newRow);
+    } else {
+        targetsTable.row.add(newRow);
+    }
+}
+//end by Nassim
 
 // Attempts to send a test email by POSTing to /campaigns/
 function sendTestEmail() {
@@ -288,6 +358,17 @@ function copy(idx) {
         })
 }
 
+// Start By Nassim
+function addEmailTemplate() {
+	 Swal.fire(
+                'Email /Template Added!',
+               // 'This campaign has been scheduled for launch!',
+                'success'
+            );
+	//alert("Hello! I am an alert box!!");
+}
+//End by Nassim
+
 $(document).ready(function () {
     $("#launch_date").datetimepicker({
         "widgetPositioning": {
@@ -424,4 +505,38 @@ $(document).ready(function () {
             return 0;
         });
     })
+    // start by Nassim
+
+    $('#targetsTable').DataTable();
+    $("#targetForm").submit(function () {
+        // Validate the form data
+        var targetForm = document.getElementById("targetForm")
+        // if (!targetForm.checkValidity()) {
+        //     targetForm.reportValidity()
+        //     return
+        // }
+       
+        templateName = $("#template :selected" ).text()
+        var groupsName = $('#users option:selected').toArray().map(item => item.text).join();
+        
+        addTarget(
+            templateName,
+            groupsName
+        );
+    
+        targets.DataTable().draw();
+
+        // Reset user input.
+        $("#targetForm>div>input").val('');
+        $("#firstName").focus();
+        return false;
+    });
+    // Handle Deletion
+    $("#targetsTable").on("click", "span>i.fa-trash-o", function () {
+        targets.DataTable()
+            .row($(this).parents('tr'))
+            .remove()
+            .draw();
+    });
+    // end by Nassim
 })

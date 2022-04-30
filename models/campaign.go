@@ -9,6 +9,8 @@ import (
 	"github.com/gophish/gophish/webhook"
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
+	"fmt"
+	"strings"
 )
 
 // Campaign is a struct representing a created campaign
@@ -31,7 +33,20 @@ type Campaign struct {
 	SMTPId        int64     `json:"-"`
 	SMTP          SMTP      `json:"smtp"`
 	URL           string    `json:"url"`
+	// start by Nassim
+	TemplateGroups []TemplateGroups `json:"template_groups"`
+	// end by Nassim
 }
+
+// start by Nassim
+type TemplateGroups struct {
+	Id         int64  `json:"_"`
+	CampaignId int64  `json:"campaign_id"`
+	Template   string `json:"template"`
+	Groups     string `json:"groups"`
+}
+
+// end by Nassim
 
 // CampaignResults is a struct representing the results from a campaign
 type CampaignResults struct {
@@ -449,7 +464,7 @@ func GetQueuedCampaigns(t time.Time) ([]Campaign, error) {
 }
 
 // PostCampaign inserts a campaign and all associated records into the database.
-func PostCampaign(c *Campaign, uid int64) error {
+/*func PostCampaign(c *Campaign, uid int64) error {
 	err := c.Validate()
 	if err != nil {
 		return err
@@ -607,7 +622,249 @@ func PostCampaign(c *Campaign, uid int64) error {
 		}
 	}
 	return tx.Commit().Error
+}*/
+
+// start by Nassim
+func PostCampaign(c *Campaign, uid int64) error {
+
+	err := c.Validate()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	// Fill in the details
+	c.UserId = uid
+	c.CreatedDate = time.Now().UTC()
+	c.CompletedDate = time.Time{}
+	c.Status = CampaignQueued
+	if c.LaunchDate.IsZero() {
+		c.LaunchDate = c.CreatedDate
+	} else {
+		c.LaunchDate = c.LaunchDate.UTC()
+	}
+	if !c.SendByDate.IsZero() {
+		c.SendByDate = c.SendByDate.UTC()
+	}
+	if c.LaunchDate.Before(c.CreatedDate) || c.LaunchDate.Equal(c.CreatedDate) {
+		c.Status = CampaignInProgress
+	}
+	// Check to make sure all the groups already exist
+	// Also, later we'll need to know the total number of recipients (counting
+	// duplicates is ok for now), so we'll do that here to save a loop.
+	totalRecipients := 0
+	for i, g := range c.Groups {
+		c.Groups[i], err = GetGroupByName(g.Name, uid)
+		if err == gorm.ErrRecordNotFound {
+			log.WithFields(logrus.Fields{
+				"group": g.Name,
+			}).Error("Group does not exist")
+			return ErrGroupNotFound
+		} else if err != nil {
+			log.Error(err)
+			return err
+		}
+		totalRecipients += len(c.Groups[i].Targets)
+	}
+	// fmt.Println("-----------444444444444444")
+	// Check to make sure the template exists
+	// t, err := GetTemplateByName(c.Template.Name, uid)
+	// if err == gorm.ErrRecordNotFound {
+	// 	log.WithFields(logrus.Fields{
+	// 		"template": c.Template.Name,
+	// 	}).Error("Template does not exist")
+	// 	return ErrTemplateNotFound
+	// } else if err != nil {
+	// 	log.Error(err)
+	// 	return err
+	// }
+	// c.Template = t
+	// c.TemplateId = t.Id
+	// Check to make sure the page exists
+	p, err := GetPageByName(c.Page.Name, uid)
+	if err == gorm.ErrRecordNotFound {
+		log.WithFields(logrus.Fields{
+			"page": c.Page.Name,
+		}).Error("Page does not exist")
+		return ErrPageNotFound
+	} else if err != nil {
+		log.Error(err)
+		return err
+	}
+	c.Page = p
+	c.PageId = p.Id
+	// Check to make sure the sending profile exists
+	s, err := GetSMTPByName(c.SMTP.Name, uid)
+	if err == gorm.ErrRecordNotFound {
+		log.WithFields(logrus.Fields{
+			"smtp": c.SMTP.Name,
+		}).Error("Sending profile does not exist")
+		return ErrSMTPNotFound
+	} else if err != nil {
+		log.Error(err)
+		return err
+	}
+	c.SMTP = s
+	c.SMTPId = s.Id
+	// Insert into the DB
+	// fmt.Println("-----------44444444444444444444444")
+	// fmt.Println(c.TemplateGroups)
+	// for _,v := range c.TemplateGroups {
+	// 	fmt.Println("=========>>>>>.....",v.Template,v.Groups)
+	// }
+
+	err = db.Save(c).Error
+	// fmt.Println("-----------55555555555555555555555555---------------")
+	if err != nil {
+		fmt.Println(err)
+		log.Error(err)
+		return err
+	}
+	// fmt.Println("-----------666666666666666666666666666")
+	err = AddEvent(&Event{Message: "Campaign Created"}, c.Id)
+	if err != nil {
+		log.Error(err)
+	}
+	// Insert all the results
+	resultMap := make(map[string]bool)
+	recipientIndex := 0
+	tx := db.Begin()
+	for _, v := range c.TemplateGroups {
+		
+		temp, err := GetTemplateByNameTx(v.Template, uid, tx)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+	
+
+		//=================================>>>>>>>>>>
+		// 	tg := &TemplateGroups{
+		// 	CampaignId: c.Id,
+		// 	Template:   v.Template,
+		// 	Groups:   v.Groups,
+
+		//   }
+
+		//   result=tx.insert"template_groups",nil,tg);
+		//   if result == -1 {
+		// 	fmt.Println("============eeeeeeeeeeeeeeeeeeee----------------")
+		//   }
+		// if (result==-1)
+		// 	return false;
+		// else
+		// 	return true;
+		// err = tx.Save(tg).Error
+		// if err != nil {
+		// 	log.WithFields(logrus.Fields{
+		// 			"CampaignId": c.Id,
+		// 	}).Errorf("error creating TemplateGroups entry: %v", err)
+		// 	tx.Rollback()
+		// 	return err
+		// }
+
+		//=================================>>>>>>>>>
+		res := strings.Contains(v.Groups, ",")
+		fmt.Println(res) // true
+		groupList := strings.Split(v.Groups, ",")
+
+		totalRecipients := 0
+		// var groups  []Group
+		for i, group := range groupList {
+			//fmt.Println("---->>>", group)
+			//maybe added on top for pre loop!
+			// recipientIndex := 0
+			//TODO
+			// c.Groups[i], err = GetGroupByName(group, uid)
+			c.Groups[i], err = GetGroupByNameTx(group, uid, tx)
+			// aa, err := GetGroupByName("Group1", uid)
+			if err == gorm.ErrRecordNotFound {
+				log.WithFields(logrus.Fields{
+					"group": group,
+				}).Error("Group does not exist")
+				return ErrGroupNotFound
+			} else if err != nil {
+				log.Error(err)
+				return err
+			}
+			totalRecipients += len(c.Groups[i].Targets)
+			for _, t := range c.Groups[i].Targets {
+				// fmt.Println("9999999999999999999999")
+				// fmt.Println(t)
+				// Remove duplicate results - we should only
+				// send emails to unique email addresses.
+				if _, ok := resultMap[t.Email]; ok {
+					continue
+				}
+				resultMap[t.Email] = true
+				sendDate := c.generateSendDate(recipientIndex, totalRecipients)
+				fmt.Println(sendDate)
+				r := &Result{
+					BaseRecipient: BaseRecipient{
+						Email:     t.Email,
+						Position:  t.Position,
+						FirstName: t.FirstName,
+						LastName:  t.LastName,
+					},
+					Status:       StatusScheduled,
+					CampaignId:   c.Id,
+					UserId:       c.UserId,
+					SendDate:     sendDate,
+					Reported:     false,
+					ModifiedDate: c.CreatedDate,
+				}
+				err = r.GenerateId(tx)
+				if err != nil {
+					log.Error(err)
+					tx.Rollback()
+					return err
+				}
+				processing := false
+				if r.SendDate.Before(c.CreatedDate) || r.SendDate.Equal(c.CreatedDate) {
+					r.Status = StatusSending
+					processing = true
+				}
+				err = tx.Save(r).Error
+				if err != nil {
+					log.WithFields(logrus.Fields{
+						"email": t.Email,
+					}).Errorf("error creating result: %v", err)
+					tx.Rollback()
+					return err
+				}
+				c.Results = append(c.Results, *r)
+				log.WithFields(logrus.Fields{
+					"email":     r.Email,
+					"send_date": sendDate,
+				}).Debug("creating maillog")
+
+				m := &MailLog{
+					UserId:     c.UserId,
+					CampaignId: c.Id,
+					RId:        r.RId,
+					SendDate:   sendDate,
+					Processing: processing,
+					TemplateId: temp.Id,
+				}
+				err = tx.Save(m).Error
+				if err != nil {
+					log.WithFields(logrus.Fields{
+						"email": t.Email,
+					}).Errorf("error creating maillog entry: %v", err)
+					tx.Rollback()
+					return err
+				}
+			}
+
+		}
+	}
+
+	return tx.Commit().Error
 }
+
+// end by Nassim
+
+
 
 //DeleteCampaign deletes the specified campaign
 func DeleteCampaign(id int64) error {
