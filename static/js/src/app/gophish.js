@@ -86,6 +86,24 @@ var api = {
             return query("/campaigns/summary", "GET", {}, false)
         }
     },
+
+    // start by Nassim
+	campaignsttt: {
+        // get() - Queries the API for GET /campaigns
+        get: function () {
+            return query("/campaignsttt/", "GET", {}, false)
+        },
+        // post() - Posts a campaign to POST /campaigns
+        post: function (data) {
+            return query("/campaignsttt/", "POST", data, false)
+        },
+        // summary() - Queries the API for GET /campaigns/summary
+        summary: function () {
+            return query("/campaignsttt/summary", "GET", {}, false)
+        }
+    },
+
+    // end by Nassim
     // campaignId contains the endpoints for /campaigns/:id
     campaignId: {
         // get() - Queries the API for GET /campaigns/:id

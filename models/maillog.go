@@ -35,7 +35,8 @@ type MailLog struct {
 	CampaignId  int64     `json:"campaign_id"`
 	//Begin by Nassim
 	TemplateId  int64     `json:"template_id"`
-	//End by Nassim       
+	ProfileId   int64     `json:"profile_id"`
+	//End by Nassim        
 	RId         string    `json:"id"`
 	SendDate    time.Time `json:"send_date"`
 	SendAttempt int       `json:"send_attempt"`
@@ -158,106 +159,105 @@ func (m *MailLog) CacheCampaign(campaign *Campaign) error {
 // the correct headers and body from the campaign and recipient listed in
 // the maillog. We accept the gomail.Message as an argument so that the caller
 // can choose to re-use the message across recipients.
-/*func (m *MailLog) Generate(msg *gomail.Message) error {
-	r, err := GetResult(m.RId)
-	if err != nil {
-		return err
-	}
-	c := m.cachedCampaign
-	if c == nil {
-		campaign, err := GetCampaignMailContext(m.CampaignId, m.UserId)
-		if err != nil {
-			return err
-		}
-		c = &campaign
-	}
+//Nassim : It must be change
+// func (m *MailLog) Generate(msg *gomail.Message) error {
+// 	r, err := GetResult(m.RId)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	c := m.cachedCampaign
+// 	if c == nil {
+// 		campaign, err := GetCampaignMailContext(m.CampaignId, m.UserId)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		c = &campaign
+// 	}
 
-	f, err := mail.ParseAddress(c.SMTP.FromAddress)
-	if err != nil {
-		return err
-	}
-	msg.SetAddressHeader("From", f.Address, f.Name)
+// 	f, err := mail.ParseAddress(c.SMTP.FromAddress)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	msg.SetAddressHeader("From", f.Address, f.Name)
 
-	ptx, err := NewPhishingTemplateContext(c, r.BaseRecipient, r.RId)
-	if err != nil {
-		return err
-	}
+// 	ptx, err := NewPhishingTemplateContext(c, r.BaseRecipient, r.RId)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// Add the transparency headers
-	msg.SetHeader("X-Mailer", config.ServerName)
-	if conf.ContactAddress != "" {
-		msg.SetHeader("X-Gophish-Contact", conf.ContactAddress)
-	}
+// 	// Add the transparency headers
+// 	msg.SetHeader("X-Mailer", config.ServerName)
+// 	if conf.ContactAddress != "" {
+// 		msg.SetHeader("X-Gophish-Contact", conf.ContactAddress)
+// 	}
 
-	// Add Message-Id header as described in RFC 2822.
-	messageID, err := m.generateMessageID()
-	if err != nil {
-		return err
-	}
-	msg.SetHeader("Message-Id", messageID)
+// 	// Add Message-Id header as described in RFC 2822.
+// 	messageID, err := m.generateMessageID()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	msg.SetHeader("Message-Id", messageID)
 
-	// Parse the customHeader templates
-	for _, header := range c.SMTP.Headers {
-		key, err := ExecuteTemplate(header.Key, ptx)
-		if err != nil {
-			log.Warn(err)
-		}
+// 	// Parse the customHeader templates
+// 	for _, header := range c.SMTP.Headers {
+// 		key, err := ExecuteTemplate(header.Key, ptx)
+// 		if err != nil {
+// 			log.Warn(err)
+// 		}
 
-		value, err := ExecuteTemplate(header.Value, ptx)
-		if err != nil {
-			log.Warn(err)
-		}
+// 		value, err := ExecuteTemplate(header.Value, ptx)
+// 		if err != nil {
+// 			log.Warn(err)
+// 		}
 
-		// Add our header immediately
-		msg.SetHeader(key, value)
-	}
+// 		// Add our header immediately
+// 		msg.SetHeader(key, value)
+// 	}
 
-	// Parse remaining templates
-	subject, err := ExecuteTemplate(c.Template.Subject, ptx)
-	if err != nil {
-		log.Warn(err)
-	}
-	// don't set Subject header if the subject is empty
-	if subject != "" {
-		msg.SetHeader("Subject", subject)
-	}
+// 	// Parse remaining templates
+// 	subject, err := ExecuteTemplate(c.Template.Subject, ptx)
+// 	if err != nil {
+// 		log.Warn(err)
+// 	}
+// 	// don't set Subject header if the subject is empty
+// 	if subject != "" {
+// 		msg.SetHeader("Subject", subject)
+// 	}
 
-	msg.SetHeader("To", r.FormatAddress())
-	if c.Template.Text != "" {
-		text, err := ExecuteTemplate(c.Template.Text, ptx)
-		if err != nil {
-			log.Warn(err)
-		}
-		msg.SetBody("text/plain", text)
-	}
-	if c.Template.HTML != "" {
-		html, err := ExecuteTemplate(c.Template.HTML, ptx)
-		if err != nil {
-			log.Warn(err)
-		}
-		if c.Template.Text == "" {
-			msg.SetBody("text/html", html)
-		} else {
-			msg.AddAlternative("text/html", html)
-		}
-	}
-	// Attach the files
-	for _, a := range c.Template.Attachments {
-		msg.Attach(func(a Attachment) (string, gomail.FileSetting, gomail.FileSetting) {
-			h := map[string][]string{"Content-ID": {fmt.Sprintf("<%s>", a.Name)}}
-			return a.Name, gomail.SetCopyFunc(func(w io.Writer) error {
-				decoder := base64.NewDecoder(base64.StdEncoding, strings.NewReader(a.Content))
-				_, err = io.Copy(w, decoder)
-				return err
-			}), gomail.SetHeader(h)
-		}(a))
-	}
+// 	msg.SetHeader("To", r.FormatAddress())
+// 	if c.Template.Text != "" {
+// 		text, err := ExecuteTemplate(c.Template.Text, ptx)
+// 		if err != nil {
+// 			log.Warn(err)
+// 		}
+// 		msg.SetBody("text/plain", text)
+// 	}
+// 	if c.Template.HTML != "" {
+// 		html, err := ExecuteTemplate(c.Template.HTML, ptx)
+// 		if err != nil {
+// 			log.Warn(err)
+// 		}
+// 		if c.Template.Text == "" {
+// 			msg.SetBody("text/html", html)
+// 		} else {
+// 			msg.AddAlternative("text/html", html)
+// 		}
+// 	}
+// 	// Attach the files
+// 	for _, a := range c.Template.Attachments {
+// 		msg.Attach(func(a Attachment) (string, gomail.FileSetting, gomail.FileSetting) {
+// 			h := map[string][]string{"Content-ID": {fmt.Sprintf("<%s>", a.Name)}}
+// 			return a.Name, gomail.SetCopyFunc(func(w io.Writer) error {
+// 				decoder := base64.NewDecoder(base64.StdEncoding, strings.NewReader(a.Content))
+// 				_, err = io.Copy(w, decoder)
+// 				return err
+// 			}), gomail.SetHeader(h)
+// 		}(a))
+// 	}
 
-	return nil
-}*/
+// 	return nil
+// }
 
-
-// Start by Nassim
 // change func by Nassim
 func (m *MailLog) Generate(msg *gomail.Message) error {
 	r, err := GetResult(m.RId)
@@ -273,7 +273,16 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 		c = &campaign
 	}
 
-	f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	// start by Nassim
+	 smtp , err := GetSMTP(m.ProfileId,m.UserId)
+	fmt.Println("============================mmmmmmmmmmmmmmmmmmm===========11111111111111",err,m.ProfileId, m.UserId, smtp.FromAddress)
+	if err != nil {
+		return err
+	}
+	// end by Nassim
+
+	// f, err := mail.ParseAddress(c.SMTP.FromAddress)
+	f, err := mail.ParseAddress(smtp.FromAddress)
 	if err != nil {
 		return err
 	}
@@ -298,7 +307,8 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 	msg.SetHeader("Message-Id", messageID)
 
 	// Parse the customHeader templates
-	for _, header := range c.SMTP.Headers {
+	// for _, header := range c.SMTP.Headers {
+	for _, header := range smtp.Headers {
 		key, err := ExecuteTemplate(header.Key, ptx)
 		if err != nil {
 			log.Warn(err)
@@ -369,7 +379,9 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 
 	return nil
 }
-// End by Nassim
+
+
+
 
 // GetQueuedMailLogs returns the mail logs that are queued up for the given minute.
 func GetQueuedMailLogs(t time.Time) ([]*MailLog, error) {

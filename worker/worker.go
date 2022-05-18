@@ -147,6 +147,48 @@ func (w *DefaultWorker) LaunchCampaign(c models.Campaign) {
 	w.mailer.Queue(mailEntries)
 }
 
+//start by Nassim
+// LaunchCampaign starts a campaign
+func (w *DefaultWorker) LaunchCampaignttt(c models.Campaignttt) {
+	//Nassim It has template ID
+	ms, err := models.GetMailLogsByCampaign(c.Id)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	models.LockMailLogs(ms, true)
+	// This is required since you cannot pass a slice of values
+	// that implements an interface as a slice of that interface.
+	mailEntries := []mailer.Mail{}
+	currentTime := time.Now().UTC()
+	//Nassim : change campain for template ID (deltet template ID)
+	campaignMailCtx, err := models.GetCampaignMailContext(c.Id, c.UserId)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	//Nassim: need another loop to get template or groups
+	for _, m := range ms {
+		// Only send the emails scheduled to be sent for the past minute to
+		// respect the campaign scheduling options
+		if m.SendDate.After(currentTime) {
+			m.Unlock()
+			continue
+		}
+		err = m.CacheCampaign(&campaignMailCtx)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		mailEntries = append(mailEntries, m)
+	}
+	w.mailer.Queue(mailEntries)
+}
+//End by Nassim
+
+
+
+
 // SendTestEmail sends a test email
 func (w *DefaultWorker) SendTestEmail(s *models.EmailRequest) error {
 	go func() {
