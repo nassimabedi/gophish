@@ -42,6 +42,10 @@ import (
 	"github.com/gophish/gophish/middleware"
 	"github.com/gophish/gophish/models"
 	"github.com/gophish/gophish/webhook"
+	"time"
+
+	// Nassim
+	"reflect"
 )
 
 const (
@@ -129,6 +133,10 @@ func main() {
 		go phishServer.Start()
 	}
 
+	// Start by Nassim
+	go heartBeat()
+	// End by Nassim
+
 	// Handle graceful shutdown
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -142,4 +150,43 @@ func main() {
 		phishServer.Shutdown()
 	}
 
+}
+func heartBeat() {
+	for range time.Tick(time.Second * 15) {
+		//CampaignComplete
+		//UpdateStatus
+		//GetCampaigns
+		//CompleteCampaign  ----> func
+		fmt.Println("*********************hhhhhhhhhhhhhhhh***********************")
+		cs, err := models.GetCampaignsByStatus()
+		if err != nil {
+			log.Error(err)
+		}
+
+		for k, v := range cs {
+			fmt.Println(k)
+			fmt.Println(v)
+			fmt.Println("======================>>>>>>>>>>>>>>>>>>id: ", v.Id)
+			fmt.Println(v.Status)
+			fmt.Println(v.CreatedDate)
+			fmt.Println(reflect.TypeOf(v.CreatedDate))
+			date_ := time.Now()
+			t := v.CreatedDate
+
+			days := diffTwoDate(date_, t)
+			fmt.Println("==================^^^^^^^^^^^^^^^^Days:", days)
+
+			if days > 3 {
+				v.UpdateStatus(models.CampaignComplete)
+				fmt.Println("================== Must Update ^^^^^^^^^^^^^^^^")
+			}
+		}
+	}
+}
+
+func diffTwoDate(date1, date2 time.Time) int {
+	format := "2006-01-02 15:04:05 +0000 UTC"
+	then, _ := time.Parse(format, date2.String())
+	diff := date1.Sub(then)
+	return int(diff.Hours() / 24)
 }

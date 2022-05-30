@@ -47,6 +47,11 @@ type TemplateGroups struct {
 	Groups     string `json:"groups"`
 }
 
+type CampaignSetting struct {
+	Id       int64 `json:"_"`
+	Duration int64 `json:"duration"`
+}
+
 // end by Nassim
 
 // CampaignResults is a struct representing the results from a campaign
@@ -660,8 +665,6 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 		return err
 	}
 
-	
-
 	// Fill in the details
 	c.UserId = uid
 	c.CreatedDate = time.Now().UTC()
@@ -725,17 +728,17 @@ func PostCampaignttt(c *Campaign, uid int64) error {
 	}
 	c.Page = p
 	c.PageId = p.Id
-	fmt.Println("3333333333333333333333============================",c.SMTP.Name, c.TemplateGroups[0].Profile,len(c.SMTP.Name),len(c.TemplateGroups[0].Profile))
+	fmt.Println("3333333333333333333333============================", c.SMTP.Name, c.TemplateGroups[0].Profile, len(c.SMTP.Name), len(c.TemplateGroups[0].Profile))
 	// Check to make sure the sending profile exists
 	s, err := GetSMTPByName(c.SMTP.Name, uid)
 	if err == gorm.ErrRecordNotFound {
-fmt.Println("==============================eeeeeee===========")
+		fmt.Println("==============================eeeeeee===========")
 		log.WithFields(logrus.Fields{
 			"smtp": c.SMTP.Name,
 		}).Error("Sending profile does not exist")
 		return ErrSMTPNotFound
 	} else if err != nil {
-fmt.Println("=======eeee11111111111111111111111111=======")
+		fmt.Println("=======eeee11111111111111111111111111=======")
 		log.Error(err)
 		return err
 	}
@@ -744,8 +747,8 @@ fmt.Println("=======eeee11111111111111111111111111=======")
 	// Insert into the DB
 	fmt.Println("-----------44444444444444444444444")
 	fmt.Println(c.TemplateGroups)
-	for _,v := range c.TemplateGroups {
-		fmt.Println("=========>>>>>.....",v.Template,v.Groups)
+	for _, v := range c.TemplateGroups {
+		fmt.Println("=========>>>>>.....", v.Template, v.Groups)
 	}
 
 	err = db.Save(c).Error
@@ -764,13 +767,13 @@ fmt.Println("=======eeee11111111111111111111111111=======")
 	resultMap := make(map[string]bool)
 	recipientIndex := 0
 	tx := db.Begin()
-	fmt.Println("-----------777777777777777777=======",c.SMTP.Name, c.TemplateGroups[0].Profile)
-       fmt.Println("--------",c.TemplateGroups)
+	fmt.Println("-----------777777777777777777=======", c.SMTP.Name, c.TemplateGroups[0].Profile)
+	fmt.Println("--------", c.TemplateGroups)
 	for _, v := range c.TemplateGroups {
-		fmt.Println(">>>>ffffffffffffffffffffffffff<<<<<<<<",v.Template,uid)
+		fmt.Println(">>>>ffffffffffffffffffffffffff<<<<<<<<", v.Template, uid)
 		temp, err := GetTemplateByNameTx(v.Template, uid, tx)
 		if err != nil {
-                fmt.Println("=======eeeeetttttttttttt=======")
+			fmt.Println("=======eeeeetttttttttttt=======")
 			log.Error(err)
 			return err
 		}
@@ -783,7 +786,6 @@ fmt.Println("=======eeee11111111111111111111111111=======")
 		}
 
 		fmt.Println("-----------99999999999999999999999999")
-	
 
 		//=================================>>>>>>>>>>
 		// 	tg := &TemplateGroups{
@@ -897,7 +899,7 @@ fmt.Println("=======eeee11111111111111111111111111=======")
 					SendDate:   sendDate,
 					Processing: processing,
 					TemplateId: temp.Id,
-					ProfileId: profile.Id,
+					ProfileId:  profile.Id,
 				}
 				err = tx.Save(m).Error
 				fmt.Println("==================oooooooooooooooooooooooooooooooooo")
@@ -976,3 +978,25 @@ func CompleteCampaign(id int64, uid int64) error {
 	}
 	return err
 }
+
+// Start by Nassim
+// GetCampaigns returns the campaigns owned by the given user.
+func GetCampaignsByStatus() ([]Campaign, error) {
+
+	cs := []Campaign{}
+	err := db.
+		Where("status != ?", CampaignComplete).Find(&cs).Error
+	if err != nil {
+		log.Error(err)
+	}
+	log.Infof("Found %d Campaigns to run\n", len(cs))
+	for i := range cs {
+		err = cs[i].getDetails()
+		if err != nil {
+			log.Error(err)
+		}
+	}
+	return cs, err
+}
+
+// End by Nassim

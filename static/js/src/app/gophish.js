@@ -103,6 +103,18 @@ var api = {
         }
     },
 
+    campaignSetting: {
+        // get() - Queries the API for GET /campaigns
+        get: function () {
+            return query("/campaign_setting", "GET", {}, false)
+        },
+        // post() - Posts a campaign to POST /campaigns
+        post: function (data) {
+            return query("/campaign_setting", "POST", data, true)
+        },
+       
+    },
+
     // end by Nassim
     // campaignId contains the endpoints for /campaigns/:id
     campaignId: {
