@@ -2,7 +2,7 @@ $(document).ready(function () {
    
     $("#settingsForm").submit(function (e) {
         alert(" form submit")
-        $.post("/campaign_setting", $(this).serialize())
+        /*$.post("/campaign_setting", $(this).serialize())
             .done(function (data) {
                 alert("post success");
                 successFlash(data.message)
@@ -10,9 +10,9 @@ $(document).ready(function () {
             .fail(function (data) {
                 alert("post fail");
                // errorFlash(data.responseJSON.message)
-            })
+            })*/
             
-           /* campaign_setting = {
+            campaign_setting = {
                 duration: $("#duration").val(),                
            }
            api.campaignSetting.post(campaign_setting)
@@ -26,7 +26,7 @@ $(document).ready(function () {
                 $("#modal\\.flashes").empty().append("<div style=\"text-align:center\" class=\"alert alert-danger\">\
     <i class=\"fa fa-exclamation-circle\"></i> " + data.responseJSON.message + "</div>")
                 Swal.close()
-            })*/
+            })
         return false
     })
     //$("#imapForm").submit(function (e) {

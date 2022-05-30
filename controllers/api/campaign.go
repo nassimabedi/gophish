@@ -74,7 +74,7 @@ func (as *Server) CampaignSetting(w http.ResponseWriter, r *http.Request) {
 			JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
 			return
 		}
-		err = models.PostCampaignttt(&c, ctx.Get(r, "user_id").(int64))
+		/*err = models.PostCampaignttt(&c, ctx.Get(r, "user_id").(int64))
 		if err != nil {
 			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusBadRequest)
 			return
@@ -83,7 +83,7 @@ func (as *Server) CampaignSetting(w http.ResponseWriter, r *http.Request) {
 		// Otherwise, the worker will pick it up at the scheduled time
 		if c.Status == models.CampaignInProgress {
 			go as.worker.LaunchCampaign(c)
-		}
+		}*/
 		JSONResponse(w, c, http.StatusCreated)
 	}
 }

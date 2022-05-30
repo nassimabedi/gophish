@@ -152,7 +152,8 @@ func main() {
 
 }
 func heartBeat() {
-	for range time.Tick(time.Second * 15) {
+	//for range time.Tick(time.Second * 15) {
+	for range time.Tick(time.Hour * 20) {
 		//CampaignComplete
 		//UpdateStatus
 		//GetCampaigns
