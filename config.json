@@ -11,8 +11,8 @@
 		"cert_path": "gophish_admin.crt",
 		"key_path": "gophish_admin.key"
 	},
-	"db_name": "mysql",
-	"db_path": "root:@(:3306)/gophish?charset=utf8&parseTime=True&loc=UTC",
+	"db_name": "sqlite3",
+	"db_path": "gophish.db",
 	"migrations_prefix": "db/db_",
 	"contact_address": "ribvar@packetlabs.io",
 	"logging": {
