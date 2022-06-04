@@ -976,3 +976,50 @@ func CompleteCampaign(id int64, uid int64) error {
 	}
 	return err
 }
+
+
+// Start by Nassim
+// GetCampaigns returns the campaigns 
+func GetCampaignsByStatus() ([]Campaign, error) {
+
+	cs := []Campaign{}
+	err := db.
+		Where("status != ?", CampaignComplete).Find(&cs).Error
+	if err != nil {
+		log.Error(err)
+	}
+	log.Infof("Found %d Campaigns to run\n", len(cs))
+	for i := range cs {
+		err = cs[i].getDetails()
+		if err != nil {
+			log.Error(err)
+		}
+	}
+	return cs, err
+}
+
+func (c *Campaign )CompleteCampaign2() error {
+	log.WithFields(logrus.Fields{
+		"campaign_id": c.Id,
+	}).Info("Marking campaign as complete")
+	
+	// Delete any maillogs still set to be sent out, preventing future emails
+	err := db.Where("campaign_id=?", c.Id).Delete(&MailLog{}).Error
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	// Don't overwrite original completed time
+	if c.Status == CampaignComplete {
+		return nil
+	}
+	// Mark the campaign as complete
+	c.CompletedDate = time.Now().UTC()
+	c.Status = CampaignComplete
+	err = db.Where("id=?", c.Id).Save(&c).Error
+	if err != nil {
+		log.Error(err)
+	}
+	return err
+}
+// End by Nassim
