@@ -25,6 +25,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/jordan-wright/unindexed"
+	"fmt"
 )
 
 // AdminServerOption is a functional option that is used to configure the
@@ -128,6 +129,7 @@ func (as *AdminServer) registerRoutes() {
 	router.HandleFunc("/reset_password", mid.Use(as.ResetPassword, mid.RequireLogin))
 	router.HandleFunc("/campaigns", mid.Use(as.Campaigns, mid.RequireLogin))
 	router.HandleFunc("/campaigns_ttt", mid.Use(as.CampaignsTtt, mid.RequireLogin))
+	router.HandleFunc("/campaign_setting", mid.Use(as.CampaignSetting, mid.RequireLogin))
 	router.HandleFunc("/campaigns/{id:[0-9]+}", mid.Use(as.CampaignID, mid.RequireLogin))
 	router.HandleFunc("/templates", mid.Use(as.Templates, mid.RequireLogin))
 	router.HandleFunc("/groups", mid.Use(as.Groups, mid.RequireLogin))
@@ -215,6 +217,63 @@ func (as *AdminServer) CampaignsTtt(w http.ResponseWriter, r *http.Request) {
         params.Title = "CampaignsTest"
         getTemplate(w, "campaigns_ttt").ExecuteTemplate(w, "base", params)
 }
+
+
+
+// Start By Nassim
+
+
+func (as *AdminServer) CampaignSetting(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("=============CampaignSetting===============")
+	params := newTemplateParams(r)
+	params.Title = "CampaignsTest"
+	getTemplate(w, "campaign_setting").ExecuteTemplate(w, "base", params)
+}
+
+
+// Campaigns handles the default path and template execution
+/*func (as *AdminServer) CampaignSetting(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("===================route===============")
+
+	switch {
+	case r.Method == "GET":
+		fmt.Println("===================route GET===============")
+		params := newTemplateParams(r)
+		params.Title = "Settings"
+		session := ctx.Get(r, "session").(*sessions.Session)
+		session.Save(r, w)
+		getTemplate(w, "campaign_setting").ExecuteTemplate(w, "base", params)
+	case r.Method == "POST":
+		fmt.Println("================== post route=======================")
+		//c := models.CampaignSetting{}
+		//u := ctx.Get(r, "user").(models.User)
+		duration := r.FormValue("duration")
+		fmt.Println(duration)
+		// Put the request into a campaign
+		/*err := json.NewDecoder(r.Body).Decode(&c)
+		fmt.Println(r.Body)
+		fmt.Println(&c)
+		if err != nil {
+			JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
+			return
+		}
+		err = models.PostCampaignttt(&c, ctx.Get(r, "user_id").(int64))
+		if err != nil {
+			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusBadRequest)
+			return
+		}
+		// If the campaign is scheduled to launch immediately, send it to the worker.
+		// Otherwise, the worker will pick it up at the scheduled time
+		if c.Status == models.CampaignInProgress {
+			go as.worker.LaunchCampaign(c)
+		}
+		JSONResponse(w, c, http.StatusCreated)
+		msg := "jhkhhk"
+		api.JSONResponse(w, msg, http.StatusOK)
+	}
+}*/
+// End By Nassim
+
 
 
 // CampaignID handles the default path and template execution
@@ -500,3 +559,4 @@ func Flash(w http.ResponseWriter, r *http.Request, t string, m string) {
 		Message: m,
 	})
 }
+

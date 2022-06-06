@@ -65,6 +65,8 @@ func (as *Server) registerRoutes() {
 	//start by Nassim
 	router.HandleFunc("/campaignsttt/", as.Campaignsttt)
 	router.HandleFunc("/campaignsttt", as.Campaigns)
+	router.HandleFunc("/campaign_setting", as.CampaignSetting)
+	router.HandleFunc("/campaign_setting/", as.CampaignSetting)
 	// end by Nassim
 	router.HandleFunc("/campaigns/summary", as.CampaignsSummary)
 	router.HandleFunc("/campaigns/{id:[0-9]+}", as.Campaign)

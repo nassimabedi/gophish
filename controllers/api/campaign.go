@@ -210,3 +210,39 @@ func (as *Server) CampaignComplete(w http.ResponseWriter, r *http.Request) {
 		JSONResponse(w, models.Response{Success: true, Message: "Campaign completed successfully!"}, http.StatusOK)
 	}
 }
+
+
+func (as *Server) CampaignSetting(w http.ResponseWriter, r *http.Request) {
+	switch {
+	case r.Method == "GET":
+		fmt.Println("GGGG")
+		cs, err := models.GetCampaigns(ctx.Get(r, "user_id").(int64))
+		if err != nil {
+			log.Error(err)
+		}
+		JSONResponse(w, cs, http.StatusOK)
+	//POST: Create a new campaign and return it as JSON
+	case r.Method == "POST":
+		fmt.Println("=========================>>>>>>>>>>PPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+		c := models.Campaign{}
+		// Put the request into a campaign
+		err := json.NewDecoder(r.Body).Decode(&c)
+		fmt.Println(r.Body)
+		fmt.Println(&c)
+		if err != nil {
+			JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
+			return
+		}
+		/*err = models.PostCampaignttt(&c, ctx.Get(r, "user_id").(int64))
+		if err != nil {
+			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusBadRequest)
+			return
+		}
+		// If the campaign is scheduled to launch immediately, send it to the worker.
+		// Otherwise, the worker will pick it up at the scheduled time
+		if c.Status == models.CampaignInProgress {
+			go as.worker.LaunchCampaign(c)
+		}*/
+		JSONResponse(w, c, http.StatusCreated)
+	}
+}
