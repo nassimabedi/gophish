@@ -5,7 +5,7 @@ import (
 	"net/http"
 	// "strconv"
 
-	ctx "github.com/gophish/gophish/context"
+	//ctx "github.com/gophish/gophish/context"
 	log "github.com/gophish/gophish/logger"
 	"github.com/gophish/gophish/models"
 	// "github.com/gorilla/mux"
@@ -17,26 +17,26 @@ import (
 func (as *Server) Campaignsttt(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.Method == "GET":
-		log.Infof("POSTCampain111111111111111111111111111111111111111111111")
-		cs, err := models.GetCampaignsttt(ctx.Get(r, "user_id").(int64))
+		cs, err := models.GetCampaignSetting()
 		if err != nil {
 			log.Error(err)
 		}
 		JSONResponse(w, cs, http.StatusOK)
 	//POST: Create a new campaign and return it as JSON
 	case r.Method == "POST":
-		
-		c := models.Campaign{}
+		c := models.CampaignSetting{}
 		// Put the request into a campaign
 		err := json.NewDecoder(r.Body).Decode(&c)
+		fmt.Println(&c)
 		if err != nil {
+			log.Error(err)
 			JSONResponse(w, models.Response{Success: false, Message: "Invalid JSON structure"}, http.StatusBadRequest)
 			return
 		}
 		
-		err = models.PostCampaignttt(&c, ctx.Get(r, "user_id").(int64))
+		err = models.InsertUpdateCampaignSetting(&c)
 		if err != nil {
-			fmt.Println("err 33333333333333333333333333333")
+			log.Error(err)
 			JSONResponse(w, models.Response{Success: false, Message: err.Error()}, http.StatusBadRequest)
 			return
 		}

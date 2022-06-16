@@ -46,7 +46,6 @@ import (
 
 	// Nassim
 	"time"
-	"reflect"
 )
 
 const (
@@ -153,9 +152,12 @@ func main() {
 
 }
 
+
+// start by Nassim
 func heartBeat() {
-	for range time.Tick(time.Second * 120) {
-	//for range time.Tick(time.Hour * 20) {
+	//for range time.Tick(time.Second * 1200000) {
+	//for range time.Tick(time.Second * 120) {
+	for range time.Tick(time.Hour * 20) {
 		//CampaignComplete
 		//UpdateStatus
 		//GetCampaigns
@@ -166,22 +168,18 @@ func heartBeat() {
 			log.Error(err)
 		}
 
-		for k, v := range cs {
-			fmt.Println(k)
-			fmt.Println(v)
-			fmt.Println("======================>>>>>>>>>>>>>>>>>>id: ", v.Id)
-			fmt.Println(v.Status)
-			fmt.Println(v.CreatedDate)
-			fmt.Println(reflect.TypeOf(v.CreatedDate))
+		for _, v := range cs {			
 			date_ := time.Now()
 			t := v.CreatedDate
 
 			days := diffTwoDate(date_, t)
-			fmt.Println("==================^^^^^^^^^^^^^^^^Days:", days)
-
-			//if days > 3 {
-			if days > 300 {				
-				//v.UpdateStatus(models.CampaignComplete)
+			defaultDays, err := models.GetCampaignSetting()
+			if err != nil {
+				log.Error(err)
+			}
+			fmt.Println("==================^^^^^^^^^^^^^^^^Days:", days , defaultDays.Duration)
+            // default is 3
+			if days > defaultDays.Duration {
 				v.CompleteCampaign2()
 				fmt.Println("================== Must Update ^^^^^^^^^^^^^^^^")
 			}
@@ -197,3 +195,5 @@ func diffTwoDate(date1, date2 time.Time) int {
 	//return int(diff.Hours() / 24)
 	return int(diff.Seconds() )
 }
+
+// End by Nassim

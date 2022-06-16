@@ -216,7 +216,7 @@ func (as *Server) CampaignSetting(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.Method == "GET":
 		fmt.Println("GGGG")
-		cs, err := models.GetCampaigns(ctx.Get(r, "user_id").(int64))
+		cs, err := models.GetCampaignSetting()
 		if err != nil {
 			log.Error(err)
 		}

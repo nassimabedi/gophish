@@ -47,6 +47,12 @@ type TemplateGroups struct {
 	Groups     string `json:"groups"`
 }
 
+
+type CampaignSetting struct {
+	Id         int64  `json:"_"`
+	Duration   int  `json:"duration"`
+}
+
 // end by Nassim
 
 // CampaignResults is a struct representing the results from a campaign
@@ -916,6 +922,7 @@ fmt.Println("=======eeee11111111111111111111111111=======")
 	return tx.Commit().Error
 }
 
+
 // end by Nassim
 
 //DeleteCampaign deletes the specified campaign
@@ -1022,4 +1029,32 @@ func (c *Campaign )CompleteCampaign2() error {
 	}
 	return err
 }
+
+
+func GetCampaignSetting() (CampaignSetting, error) {
+	c := CampaignSetting{}
+	//err := db.Where("id = ?", id).Where("user_id = ?", uid).Find(&c).Error
+	err := db.Find(&c).Limit(1).Error
+	if err != nil {
+		log.Errorf("%s: campaign setting not found", err)
+		return c, err
+	}
+	return c, err
+}
+
+func InsertUpdateCampaignSetting(cs *CampaignSetting ) error {
+	c, err := GetCampaignSetting()
+	if err != nil {
+		return err
+	}
+	
+	c.Duration =  cs.Duration
+	//TODO
+	err = db.Where("id=?", 1).Save(&c).Error
+	if err != nil {
+		log.Error(err)
+	}
+	return err
+}
+
 // End by Nassim
