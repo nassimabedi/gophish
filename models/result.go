@@ -120,7 +120,61 @@ func (r *Result) HandleClickedLink(details EventDetails) error {
 	}
 	r.Status = EventClicked
 	r.ModifiedDate = event.Time
-	return db.Save(r).Error
+	//return db.Save(r).Error
+	//Start by Nassim
+	err = db.Save(r).Error
+
+	/*cr := CampaignResults{}
+	err = db.Table("results").Where("campaign_id=? and status=?", r.Id, CampaignComplete).Find(&cr.Results).Error
+	if err != nil {
+		log.Errorf("%s: results not found for campaign", err)
+		return cr, err
+	}
+	err := db.Where("r_id=?", rid).First(&r).Error
+	return err*/
+
+	//s := CampaignResults{}
+	s := CampaignStats{}
+	query := db.Table("results").Where("campaign_id = ? AND status= ? ", r.Id , CampaignComplete)
+	err = query.Count(&s.Total).Error
+	if err != nil {
+		return err
+	}
+    s1 := CampaignStats{}
+	query1 := db.Table("results").Where("campaign_id = ?  ", r.Id )
+	err = query1.Count(&s1.Total).Error
+	if err != nil {
+		return err
+	}
+
+	if s1 == s {
+		log.Info("All users Clicked")
+
+		err := db.Table("mail_logs").Where("campaign_id=?", r.Id).Delete(&MailLog{}).Error
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		c := Campaign {}
+		// Don't overwrite original completed time
+		
+		// Mark the campaign as complete
+		c.CompletedDate = time.Now().UTC()
+		c.Status = CampaignComplete
+		err = db.Table("campaigns").Where("id=?", r.Id).Save(&c).Error
+		if err != nil {
+			log.Error(err)
+		}
+	} else {
+		log.Info("clicked not complete s",s,s1)
+
+	}
+
+	return nil
+
+
+	//Start by Nassim
 }
 
 // HandleFormSubmit updates a Result in the case where the recipient submitted
