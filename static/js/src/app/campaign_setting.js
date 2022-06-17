@@ -1,6 +1,6 @@
 $(document).ready(function () {
     console.log("jquery");
-    function confirmDelete() {
+    /*function confirmDelete() {
         swal({
             title: "Are you sure?",
             text: "You will not be able to recover this imaginary file!",
@@ -17,7 +17,7 @@ $(document).ready(function () {
                 document.deleteForm.submit();
             }
         });
-    }
+    }*/
     api.campaignsttt.get()
         .success(function (result) {
             $("#duration").val(result.duration)

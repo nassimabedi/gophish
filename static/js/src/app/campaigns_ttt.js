@@ -79,7 +79,8 @@ var targets = [];
                 }
                 // Submit the campaign
                 
-                api.campaignsttt.post(campaign)
+                //api.campaignsttt.post(campaign)
+                api.campaigns.post(campaign)
                 
                 // api.nassim.post(campaign)
                     .success(function (data) {
@@ -101,8 +102,11 @@ var targets = [];
                 'success'
             );
         }
+
         $('button:contains("OK")').on('click', function () {
-            window.location = "/campaigns/" + campaign.id.toString()
+            
+            var campId = campaign.id
+            window.location = "/campaigns/" + campId.toString()
         })
     })
 }
@@ -279,7 +283,7 @@ function setupOptions() {
                     obj.title = obj.num_targets + " targets"
                     return obj
                 });
-                console.log(group_s2)
+                //console.log(group_s2)
                 $("#users.form-control").select2({
                     placeholder: "Select Groups",
                     data: group_s2,
