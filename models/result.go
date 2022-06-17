@@ -120,9 +120,9 @@ func (r *Result) HandleClickedLink(details EventDetails) error {
 	}
 	r.Status = EventClicked
 	r.ModifiedDate = event.Time
-	//return db.Save(r).Error
+	return db.Save(r).Error
 	//Start by Nassim
-	err = db.Save(r).Error
+	//err = db.Save(r).Error
 
 	/*cr := CampaignResults{}
 	err = db.Table("results").Where("campaign_id=? and status=?", r.Id, CampaignComplete).Find(&cr.Results).Error
@@ -134,8 +134,22 @@ func (r *Result) HandleClickedLink(details EventDetails) error {
 	return err*/
 
 	//s := CampaignResults{}
+
+    /*ss := CampaignStats{}
+	query := db.Table("results").Where("campaign_id = ?", r.Id )
+	err = query.Count(&ss.Total).Error
+	if err != nil {
+		return err
+	}
+
+	log.Info("========================>>>>",ss.Total, ss.ClickedLink)
+
+	//===============================
+
+
+
 	s := CampaignStats{}
-	query := db.Table("results").Where("campaign_id = ? AND status= ? ", r.Id , CampaignComplete)
+	query = db.Table("results").Where("campaign_id = ? AND status= ? ", r.Id , CampaignComplete)
 	err = query.Count(&s.Total).Error
 	if err != nil {
 		return err
@@ -171,7 +185,7 @@ func (r *Result) HandleClickedLink(details EventDetails) error {
 
 	}
 
-	return nil
+	return nil*/
 
 
 	//Start by Nassim

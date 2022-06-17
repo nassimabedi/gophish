@@ -1031,6 +1031,65 @@ func (c *Campaign )CompleteCampaign2() error {
 }
 
 
+func CheckAllUserClicked ( cid int64) error {
+	/*cs := CampaignStats{}
+    //s := CampaignStats{}
+	query := db.Table("results").Where("campaign_id = ?", r.CampaignId)
+	log.Info("=============checkAllUserClicked==================",r.CampaignId, &cs.Total, &cs.ClickedLink)
+	err := query.Count(&cs.Total).Error
+	if err != nil {
+		return  err
+	}*/
+
+
+	/*err = db.Table("results").Where("campaign_id=?", r.CampaignId).Find(&cr.Results).Error
+	if err != nil {
+		log.Errorf("%s: results not found for campaign", err)
+		return cr, err
+	}
+	err := db.Where("r_id=?", rid).First(&r).Error
+	return err*/
+	
+	s := CampaignStats{}
+	query := db.Table("results").Where("campaign_id = ?", cid)
+	log.Infof("===================>>>>>>>>>>>>>>>>>>>1111111", s.Total, s.ClickedLink)
+	
+	err := query.Count(&s.Total).Error
+	log.Infof("===================>>>>>>>>>>>>>>>>>>>2222222222", s.Total, s.ClickedLink)
+	if err != nil {
+		//return s, err
+		return err
+	}
+	return err
+}
+
+func (r *Result )CompleteCampaign3() error {
+	log.WithFields(logrus.Fields{
+		"campaign_id": r.CampaignId,
+	}).Info("Marking campaign as complete")
+	
+	// Delete any maillogs still set to be sent out, preventing future emails
+	err := db.Where("campaign_id=?", r.CampaignId).Delete(&MailLog{}).Error
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	c := &Campaign{}
+	// Don't overwrite original completed time
+	if c.Status == CampaignComplete {
+		return nil
+	}
+	// Mark the campaign as complete
+	c.CompletedDate = time.Now().UTC()
+	c.Status = CampaignComplete
+	err = db.Where("id=?", r.CampaignId).Save(&c).Error
+	if err != nil {
+		log.Error(err)
+	}
+	return err
+}
+
+
 func GetCampaignSetting() (CampaignSetting, error) {
 	c := CampaignSetting{}
 	//err := db.Where("id = ?", id).Where("user_id = ?", uid).Find(&c).Error
