@@ -252,14 +252,18 @@ func (ps *PhishingServer) PhishHandler(w http.ResponseWriter, r *http.Request) {
 			log.Error(err)
 		}
 
-		log.Info("============ handle clicked Finished ==================")
+		log.Info("============ handle clicked Finished ==================",rs.CampaignId,rs.UserId)
 		//cs, err := models.getCampaignStats(rs.CampaignId)
-		err = models.CheckAllUserClicked(rs.CampaignId)
-		//log.Info(cs, cs.Total, cs. ClickedLink)
+		check, err  := models.CheckAllUserClicked(rs.CampaignId)
 		if err != nil {
 			log.Error(err)
 		}
-		//err = rs.CompleteCampaign3()
+		if check {
+			err = models.CompleteCampaign3(rs.CampaignId)
+			if err != nil {
+				log.Error(err)
+			}
+		}
 	case r.Method == "POST":
 		err = rs.HandleFormSubmit(d)
 		if err != nil {

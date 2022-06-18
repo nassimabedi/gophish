@@ -1031,7 +1031,7 @@ func (c *Campaign )CompleteCampaign2() error {
 }
 
 
-func CheckAllUserClicked ( cid int64) error {
+func CheckAllUserClicked ( cid int64) (bool,error) {
 	/*cs := CampaignStats{}
     //s := CampaignStats{}
 	query := db.Table("results").Where("campaign_id = ?", r.CampaignId)
@@ -1058,23 +1058,41 @@ func CheckAllUserClicked ( cid int64) error {
 	log.Infof("===================>>>>>>>>>>>>>>>>>>>2222222222", s.Total, s.ClickedLink)
 	if err != nil {
 		//return s, err
-		return err
+		return false, err
 	}
-	return err
+
+
+	ms := []Result{}
+    err = db.Table("results").Where("campaign_id = ?", cid).Find(&ms).Error
+    log.Info(ms)
+	lenTotal := len(ms)
+	log.Info(lenTotal)
+	ms1 := []Result{}
+    err = db.Table("results").Where("campaign_id = ? AND status=?", cid,EventClicked).Find(&ms1).Error
+    log.Info(ms1)
+	lenClicked := len(ms1)
+	log.Info(lenClicked)
+	if lenClicked == lenTotal {
+		return true, err
+	}
+	return false, err
 }
 
-func (r *Result )CompleteCampaign3() error {
+func CompleteCampaign3(id int64) error {
 	log.WithFields(logrus.Fields{
-		"campaign_id": r.CampaignId,
+		"campaign_id": id,
 	}).Info("Marking campaign as complete")
+	c, err := GetCampaignWithoutUid(id)
+	if err != nil {
+		return err
+	}
 	
 	// Delete any maillogs still set to be sent out, preventing future emails
-	err := db.Where("campaign_id=?", r.CampaignId).Delete(&MailLog{}).Error
+	err = db.Where("campaign_id=?", id).Delete(&MailLog{}).Error
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	c := &Campaign{}
 	// Don't overwrite original completed time
 	if c.Status == CampaignComplete {
 		return nil
@@ -1082,7 +1100,7 @@ func (r *Result )CompleteCampaign3() error {
 	// Mark the campaign as complete
 	c.CompletedDate = time.Now().UTC()
 	c.Status = CampaignComplete
-	err = db.Where("id=?", r.CampaignId).Save(&c).Error
+	err = db.Where("id=?", id).Save(&c).Error
 	if err != nil {
 		log.Error(err)
 	}
@@ -1114,6 +1132,17 @@ func InsertUpdateCampaignSetting(cs *CampaignSetting ) error {
 		log.Error(err)
 	}
 	return err
+}
+
+func GetCampaignWithoutUid(id int64) (Campaign, error) {
+	c := Campaign{}
+	err := db.Where("id = ?", id).Find(&c).Error
+	if err != nil {
+		log.Errorf("%s: campaign not found", err)
+		return c, err
+	}
+	err = c.getDetails()
+	return c, err
 }
 
 // End by Nassim
